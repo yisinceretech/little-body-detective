@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>身體聲音合成器 v5.1 - 2.5D 解剖互動版</title>
+  <title>身體聲音合成器 v4.4 - 2.5D 解剖互動版</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     /* 全域重置與 16:9 Dashboard 滿版佈局 */
@@ -53,8 +53,8 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
+      gap: 12px; justify-content: space-between;
+      overflow-y: hidden;
       padding-right: 4px;
     }
 
@@ -385,7 +385,7 @@
       font-size: 11px;
     }
 
-    /* 右側 2.5D 展示區 (固定視角，不可移動或旋轉) */
+    /* 右側 2.5D 展示區 */
     .right-display {
       flex: 1;
       height: 100%;
@@ -492,8 +492,8 @@
       <div class="header-box">
         <div class="title-row">
           <span class="main-title">身體聲音合成器</span>
-          <span class="version-tag">v5.1</span>
-          <span class="capsule-badge">2.5D 定角解剖互動版</span>
+          <span class="version-tag">v4.4</span>
+          <span class="capsule-badge">2.5D 解剖互動版</span>
         </div>
         <div class="subtitle">聽見身體的節奏，感受生命的律動</div>
       </div>
@@ -1016,6 +1016,7 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
       characterGroup = new THREE.Group();
+      characterGroup.scale.set(1.1, 1.1, 1.1);
       scene.add(characterGroup);
 
       // 橢圓陰影
@@ -1102,9 +1103,68 @@
       });
     }
 
-    /* 點擊器官互動（已移除拖曳旋轉與移動） */
+    /* 點擊與拖曳互動 */
     function setupMouseInteraction(container) {
+      let isDragging = false;
+      let previousMousePosition = { x: 0, y: 0 };
+      let dragStartPos = { x: 0, y: 0 };
+
+      container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragStartPos = { x: e.clientX, y: e.clientY };
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      });
+
+      container.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+          const deltaMove = {
+            x: e.clientX - previousMousePosition.x,
+            y: e.clientY - previousMousePosition.y
+          };
+
+          characterGroup.rotation.y += deltaMove.x * 0.01;
+          characterGroup.rotation.x += deltaMove.y * 0.01;
+
+          // Limit rotation
+          characterGroup.rotation.x = Math.max(-0.5, Math.min(0.5, characterGroup.rotation.x));
+          characterGroup.rotation.y = Math.max(-1.0, Math.min(1.0, characterGroup.rotation.y));
+
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+      });
+
+      container.addEventListener('mouseup', (e) => {
+        isDragging = false;
+      });
+
+      container.addEventListener('mouseleave', () => {
+        isDragging = false;
+      });
+
+      container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        characterGroup.scale.x += e.deltaY * -0.001;
+        characterGroup.scale.y += e.deltaY * -0.001;
+        characterGroup.scale.z += e.deltaY * -0.001;
+
+        // limit scale
+        const minScale = 0.5;
+        const maxScale = 2.0;
+        characterGroup.scale.x = Math.max(minScale, Math.min(maxScale, characterGroup.scale.x));
+        characterGroup.scale.y = Math.max(minScale, Math.min(maxScale, characterGroup.scale.y));
+        characterGroup.scale.z = Math.max(minScale, Math.min(maxScale, characterGroup.scale.z));
+      });
+
+      container.addEventListener('dblclick', () => {
+        characterGroup.rotation.set(0, 0, 0);
+        characterGroup.scale.set(1.1, 1.1, 1.1);
+      });
+
       container.addEventListener('click', (e) => {
+        // Only trigger click if we didn't drag significantly
+        const dist = Math.hypot(e.clientX - dragStartPos.x, e.clientY - dragStartPos.y);
+        if (dist > 5) return;
+
         const rect = container.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
@@ -1241,7 +1301,7 @@
       // 自然呼吸輕微起伏（原定角狀態）
       if (characterGroup) {
         characterGroup.position.y = Math.sin(time * nut.breathSpeed * 2) * 0.03;
-        characterGroup.rotation.set(0, 0, 0); // 確保角色永遠保持正面固定定角
+        // allow rotation by drag
       }
 
       // 腸胃動態
@@ -1342,7 +1402,11 @@
         if (audioCtx && masterGain) {
           masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
           masterGain.gain.setValueAtTime(masterGain.gain.value, audioCtx.currentTime);
-          masterGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+          // 淡出避免音量為 0 時指數漸變報錯
+          if (masterGain.gain.value <= 0) {
+            masterGain.gain.value = 0.00001;
+          }
+          masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
           setTimeout(() => {
             state.isListening = false;
             document.getElementById('status-dot').classList.remove('active');
