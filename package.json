@@ -1,0 +1,15 @@
+{
+  "name": "little-body-detective",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'Static app, no build step needed'"
+  },
+  "dependencies": {
+    "@google/genai": "^2.18.0",
+    "express": "^4.21.2"
+  }
+}

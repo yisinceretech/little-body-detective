@@ -1,0 +1,8 @@
+{
+  "name": "身體聲音合成器",
+  "description": "3D Q版小女孩解剖互動身體聲音合成器，提供即時心跳與腸胃聽診音效、ECG 與生理律動監視器模擬。",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

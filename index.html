@@ -3,37 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>身體聲音合成器 v4.4 - 2.5D 解剖互動版</title>
+  <title>3D Q 版小女孩 - 身體聲音合成器與生理律動模擬</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
-    /* 全域重置與 16:9 Dashboard 滿版佈局 */
+    /* 全域重置與 16:9 Dashboard 簡約白色卡片式佈局 */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       user-select: none;
     }
+    :root {
+      --ui-font-scale: 1.15;
+      --base-font-size: 14px;
+    }
     html, body {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background: linear-gradient(135deg, #1e0b36 0%, #311059 35%, #112255 70%, #080f1e 100%);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      color: #ffffff;
+      background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+      color: #0f172a;
+      font-size: calc(var(--base-font-size) * var(--ui-font-scale));
     }
 
-    /* 背景柔光球體 */
+    /* 背景柔和光暈點綴 */
     .bg-glow {
       position: absolute;
       border-radius: 50%;
       filter: blur(90px);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.6;
+      opacity: 0.5;
     }
-    .glow-1 { width: 450px; height: 450px; background: rgba(168, 85, 247, 0.28); top: -120px; left: -120px; }
-    .glow-2 { width: 550px; height: 550px; background: rgba(59, 130, 246, 0.22); bottom: -180px; right: 8%; }
-    .glow-3 { width: 380px; height: 380px; background: rgba(236, 72, 153, 0.2); top: 25%; left: 35%; }
+    .glow-1 { width: 480px; height: 480px; background: rgba(244, 114, 182, 0.08); top: -120px; left: -120px; }
+    .glow-2 { width: 580px; height: 580px; background: rgba(56, 189, 248, 0.08); bottom: -180px; right: 8%; }
+    .glow-3 { width: 420px; height: 420px; background: rgba(168, 85, 247, 0.06); top: 25%; left: 35%; }
 
     /* 主容器 */
     .dashboard-container {
@@ -42,259 +47,500 @@
       display: flex;
       width: 100vw;
       height: 100vh;
-      padding: 16px;
-      gap: 16px;
+      padding: 18px;
+      gap: 18px;
     }
 
-    /* 左側控制面板 (38%) */
+    /* 左側控制面板 (42%) */
     .left-panel {
-      flex: 0 0 38%;
-      max-width: 38%;
+      flex: 0 0 42%;
+      max-width: 42%;
       height: 100%;
       display: flex;
       flex-direction: column;
-      gap: 12px; justify-content: space-between;
-      overflow-y: hidden;
-      padding-right: 4px;
+      gap: 14px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 6px;
     }
 
     .left-panel::-webkit-scrollbar {
-      width: 4px;
+      width: 6px;
+    }
+    .left-panel::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 6px;
     }
     .left-panel::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.25);
-      border-radius: 4px;
+      background: #cbd5e1;
+      border-radius: 6px;
+    }
+    .left-panel::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
 
-    /* 頂部標題區 */
+    /* 頂部標題區 (簡約純白卡片) */
     .header-box {
-      background: rgba(15, 23, 42, 0.72);
-      backdrop-filter: blur(20px);
-      border: 1.5px solid rgba(255, 255, 255, 0.18);
-      border-radius: 16px;
-      padding: 14px 18px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
     .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .title-left {
       display: flex;
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
     }
     .main-title {
-      font-size: 22px;
-      font-weight: 800;
-      background: linear-gradient(180deg, #ffffff 0%, #fef08a 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+      font-size: 24px;
+      font-weight: 900;
+      color: #0f172a;
+      letter-spacing: 0.3px;
     }
     .version-tag {
-      font-size: 12px;
-      color: #c084fc;
-      font-weight: bold;
+      font-size: 12.5px;
+      color: #475569;
+      font-weight: 700;
+      background: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
     }
     .capsule-badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      background: rgba(217, 70, 239, 0.25);
-      border: 1px solid rgba(244, 114, 182, 0.5);
-      color: #f472b6;
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 14px;
+      background: #fdf2f8;
+      border: 1px solid #fbcfe8;
+      color: #db2777;
+    }
+    .font-size-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+    .btn-font-scale {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .btn-font-scale:hover {
+      background: #e2e8f0;
+      color: #0284c7;
+    }
+    .btn-font-scale.active {
+      background: #0284c7;
+      color: #ffffff;
     }
     .subtitle {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-top: 3px;
+      font-size: 13.5px;
+      color: #64748b;
+      font-weight: 500;
     }
 
-    /* 玻璃擬態卡片 */
+    /* 簡約純白卡片 */
     .glass-card {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(18px);
-      border: 1.5px solid rgba(255, 255, 255, 0.18);
-      border-radius: 16px;
-      padding: 14px 16px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       flex-shrink: 0;
     }
 
     .section-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: #93c5fd;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: #0f172a;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-bottom: 2px;
+      letter-spacing: 0.2px;
     }
 
     /* 第一列：監聽控制與聽診模式 */
     .row-audio-mode {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
     .btn-group-audio {
       display: flex;
-      gap: 6px;
+      gap: 8px;
     }
     .btn-main {
       flex: 1;
-      padding: 8px 4px;
+      padding: 10px 8px;
       border: none;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 6px;
       transition: all 0.2s ease;
       color: #fff;
     }
     .btn-start {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
     }
-    .btn-start:hover { background: linear-gradient(135deg, #34d399 0%, #10b981 100%); }
+    .btn-start:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-1px);
+    }
     .btn-stop {
-      background: linear-gradient(135deg, #475569 0%, #334155 100%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #64748b;
+      border: 1px solid #475569;
     }
-    .btn-stop:hover { background: #64748b; }
+    .btn-stop:hover {
+      background: #475569;
+      transform: translateY(-1px);
+    }
     
     .status-indicator {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      margin-top: 6px;
-      color: #cbd5e1;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+      color: #475569;
     }
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      background: #64748b;
+      background: #94a3b8;
     }
-    .dot.active { background: #10b981; box-shadow: 0 0 8px #10b981; }
+    .dot.active { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
 
     .btn-mode {
       flex: 1;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1.5px solid rgba(255, 255, 255, 0.15);
-      background: rgba(30, 41, 59, 0.5);
-      color: #cbd5e1;
-      font-size: 12px;
-      font-weight: 600;
+      padding: 10px 8px;
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 6px;
+    }
+    .btn-mode:hover {
+      transform: translateY(-1px);
+      background: #f1f5f9;
+      border-color: #cbd5e1;
     }
     .btn-mode.active-heart {
       border-color: #ef4444;
-      background: rgba(239, 68, 68, 0.25);
-      color: #fca5a5;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+      background: #fef2f2;
+      color: #dc2626;
+      box-shadow: 0 2px 10px rgba(239, 68, 68, 0.12);
     }
     .btn-mode.active-gut {
       border-color: #10b981;
-      background: rgba(16, 185, 129, 0.25);
-      color: #6ee7b7;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+      background: #f0fdf4;
+      color: #16a34a;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.12);
     }
 
     /* 主音量控制滑桿 */
     .volume-box {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(30, 41, 59, 0.4);
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      gap: 10px;
+      background: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
     }
     .vol-slider {
       flex: 1;
       -webkit-appearance: none;
       appearance: none;
-      height: 4px;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, 0.3);
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
       outline: none;
     }
     .vol-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 12px;
-      height: 12px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      background: #38bdf8;
+      background: #0284c7;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
       cursor: pointer;
     }
 
-    /* 角色選擇 */
-    .char-select {
-      width: 100%;
-      padding: 8px 10px;
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    /* 角色卡片 (簡約淺色系) */
+    .ai-character-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ai-char-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .ai-char-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-char-status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      color: #fff;
       font-size: 12px;
-      outline: none;
+      color: #475569;
+    }
+    .ai-status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    /* 匯出 PNG 膠囊按鈕 */
+    .btn-ai-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      border-radius: 20px;
       cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-ai-pill:hover {
+      background: #d1fae5;
+      transform: translateY(-1px);
     }
 
     /* 營養狀態按鈕 */
     .nutrition-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 4px;
+      gap: 6px;
     }
     .btn-nutri {
-      padding: 6px 2px;
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
-      color: #cbd5e1;
-      font-size: 10px;
+      padding: 8px 4px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 4px;
     }
-    .btn-nutri:hover { background: rgba(51, 65, 85, 0.8); }
+    .btn-nutri span:first-child {
+      font-size: 18px;
+    }
+    .btn-nutri:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
     .btn-nutri.selected {
-      border-color: #38bdf8;
-      background: rgba(56, 189, 248, 0.25);
-      color: #7dd3fc;
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+      border-color: #3b82f6;
+      background: #eff6ff;
+      color: #1d4ed8;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+    }
+
+    /* 情緒面板與自然眨眼監測儀 */
+    .emotion-section-box {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .emotion-status-pill {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 12px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      transition: all 0.2s ease;
+    }
+    .emotion-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+    .btn-emotion {
+      padding: 7px 3px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      user-select: none;
+    }
+    .btn-emotion span:first-child {
+      font-size: 17px;
+    }
+    .btn-emotion:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+    .btn-emotion.selected {
+      border-color: #8b5cf6;
+      background: #f5f3ff;
+      color: #6d28d9;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.16);
+    }
+    .blink-monitor-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 7px 9px;
+      font-size: 11.5px;
+    }
+    .blink-monitor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .blink-live-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      transition: background 0.06s ease, transform 0.06s ease;
+    }
+    .blink-live-dot.active {
+      background: #ef4444;
+      transform: scale(1.4);
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+    }
+    .blink-mini-indicator {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #8b5cf6;
+      margin-right: 4px;
+      vertical-align: middle;
+      transition: transform 0.06s ease, background 0.06s ease;
+    }
+    .blink-mini-indicator.active {
+      transform: scale(1.6);
+      background: #ec4899;
+      box-shadow: 0 0 6px rgba(236, 72, 153, 0.8);
+    }
+    .blink-meta-tag {
+      font-size: 10.5px;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+    .blink-activity-meter {
+      height: 4px;
+      background: #f1f5f9;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .blink-activity-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0284c7, #8b5cf6, #ef4444);
+      transition: width 0.35s ease;
     }
 
     /* BPM 控制與快速預設按鈕 */
     .bpm-container {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
     .bpm-header {
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
-      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
     }
     .bpm-presets {
       display: flex;
@@ -302,98 +548,107 @@
     }
     .btn-preset {
       flex: 1;
-      padding: 4px;
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
-      color: #94a3b8;
-      font-size: 10px;
+      padding: 6px 4px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
     }
     .btn-preset:hover {
-      background: rgba(56, 189, 248, 0.2);
-      color: #38bdf8;
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #2563eb;
+      transform: translateY(-1px);
     }
     .bpm-slider {
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: linear-gradient(90deg, #a855f7 0%, #3b82f6 100%);
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #f472b6 0%, #38bdf8 100%);
       outline: none;
     }
     .bpm-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: #ffffff;
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+      border: 2px solid #0284c7;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       cursor: pointer;
     }
 
-    /* 波形監視器 */
+    /* 波形監視器 (醫療級清晰監視卡片) */
     .waveform-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
     }
     .wave-box {
-      background: rgba(10, 15, 30, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      padding: 6px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
     .wave-title {
-      font-size: 10px;
-      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 800;
+      color: #475569;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
     canvas.wave-canvas {
       width: 100%;
-      height: 58px;
-      background: #050814;
-      border-radius: 4px;
+      height: 64px;
+      background: #090d16;
+      border-radius: 6px;
     }
 
     /* 底部資訊卡片 */
     .bottom-info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
       flex-shrink: 0;
     }
     .info-card-sm {
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 10px;
-      line-height: 1.4;
-      color: #cbd5e1;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #334155;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
     .info-card-sm h5 {
-      color: #f472b6;
-      margin-bottom: 4px;
-      font-size: 11px;
+      color: #db2777;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 800;
     }
 
-    /* 右側 2.5D 展示區 */
+    /* 右側 2.5D 展示區 (純白極簡醫學工作台) */
     .right-display {
       flex: 1;
       height: 100%;
       position: relative;
-      border-radius: 20px;
+      border-radius: 22px;
       overflow: hidden;
-      background: rgba(15, 23, 42, 0.35);
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      background: radial-gradient(circle at 50% 45%, #ffffff 0%, #f8fafc 55%, #f1f5f9 100%);
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
     }
     #three-canvas {
       width: 100%;
@@ -412,52 +667,114 @@
       z-index: 5;
     }
     .svg-line {
-      stroke: rgba(244, 114, 182, 0.8);
-      stroke-width: 1.5;
+      stroke-width: 2.2;
       stroke-dasharray: 4,4;
-      filter: drop-shadow(0 0 4px #f472b6);
     }
-
-    /* 浮動標籤與狀態卡片 */
-    .floating-card {
-      position: absolute;
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 11px;
-      pointer-events: auto;
-      z-index: 6;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    .svg-line-heart {
+      stroke: #ef4444;
+    }
+    .svg-line-gut {
+      stroke: #10b981;
+    }
+    .svg-dot {
       transition: all 0.2s ease;
     }
-    #tag-heart { top: 22%; left: 8%; border-left: 3px solid #ef4444; cursor: pointer; }
-    #tag-gut { top: 60%; right: 8%; border-right: 3px solid #10b981; cursor: pointer; }
-    #tag-heart:hover { transform: scale(1.04); background: rgba(239, 68, 68, 0.2); }
-    #tag-gut:hover { transform: scale(1.04); background: rgba(16, 185, 129, 0.2); }
+    .svg-dot-heart {
+      fill: #ef4444;
+      stroke: #ffffff;
+      stroke-width: 2;
+    }
+    .svg-dot-gut {
+      fill: #10b981;
+      stroke: #ffffff;
+      stroke-width: 2;
+    }
+
+    /* 浮動標籤與狀態卡片 (純白玻璃擬態) */
+    .floating-card {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 13.5px;
+      pointer-events: auto;
+      z-index: 6;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      line-height: 1.55;
+      color: #0f172a;
+    }
+    .organ-card {
+      right: 20px;
+      width: 170px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .organ-card-heart {
+      top: 32%;
+      border: 1.5px solid #fecaca;
+      background: #ffffff;
+    }
+    .organ-card-gut {
+      top: 49%;
+      border: 1.5px solid #bbf7d0;
+      background: #ffffff;
+    }
+    .organ-card-heart:hover, .organ-card-heart.active {
+      transform: scale(1.03) translateX(-4px);
+      border-color: #ef4444;
+      background: #fff5f5;
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.15);
+    }
+    .organ-card-gut:hover, .organ-card-gut.active {
+      transform: scale(1.03) translateX(-4px);
+      border-color: #10b981;
+      background: #f0fdf4;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
+    }
+    .organ-card-title {
+      font-size: 15.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .organ-card-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 3px;
+    }
+    .organ-card-status {
+      font-size: 12.5px;
+      margin-top: 4px;
+      color: #334155;
+    }
 
     .top-right-status {
-      top: 16px;
-      right: 16px;
-      width: 200px;
+      top: 18px;
+      right: 20px;
+      width: 220px;
     }
     .bottom-right-status {
-      bottom: 16px;
-      right: 16px;
+      bottom: 18px;
+      right: 20px;
       width: 220px;
     }
     .status-header {
-      font-weight: bold;
-      color: #38bdf8;
-      margin-bottom: 4px;
-      font-size: 12px;
+      font-weight: 800;
+      color: #0284c7;
+      margin-bottom: 6px;
+      font-size: 14.5px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 4px;
     }
 
     #file-input { display: none; }
 
     /* RWD 支援 */
-    @media (max-width: 900px) {
+    @media (max-width: 1024px) {
       body, html {
         overflow-y: auto;
       }
@@ -465,6 +782,7 @@
         flex-direction: column;
         height: auto;
         min-height: 100vh;
+        padding: 12px;
       }
       .left-panel {
         flex: none;
@@ -474,7 +792,7 @@
       }
       .right-display {
         width: 100%;
-        height: 480px;
+        height: 520px;
       }
     }
   </style>
@@ -491,9 +809,17 @@
       
       <div class="header-box">
         <div class="title-row">
-          <span class="main-title">身體聲音合成器</span>
-          <span class="version-tag">v4.4</span>
-          <span class="capsule-badge">2.5D 解剖互動版</span>
+          <div class="title-left">
+            <span class="main-title">身體聲音合成器</span>
+            <span class="version-tag">v2.9.1</span>
+            <span class="capsule-badge">Q版女孩特仕版</span>
+          </div>
+          <div class="font-size-controls" title="字體大小調節">
+            <span style="font-size: 12px; color: #94a3b8;">字體:</span>
+            <button class="btn-font-scale" data-scale="1.0">標準</button>
+            <button class="btn-font-scale active" data-scale="1.15">大</button>
+            <button class="btn-font-scale" data-scale="1.3">特大</button>
+          </div>
         </div>
         <div class="subtitle">聽見身體的節奏，感受生命的律動</div>
       </div>
@@ -502,60 +828,98 @@
         
         <div class="row-audio-mode">
           <div>
-            <div class="section-title">🎙️ 監聽控制</div>
+            <div class="section-title">監聽控制</div>
             <div class="btn-group-audio">
-              <button class="btn-main btn-start" id="btn-start">▶ 開始</button>
-              <button class="btn-main btn-stop" id="btn-stop">◼ 停止</button>
+              <button class="btn-main btn-start" id="btn-start">▶ 開始監聽</button>
+              <button class="btn-main btn-stop" id="btn-stop">◼ 停止監聽</button>
             </div>
             <div class="status-indicator">
-              <div class="dot" id="status-dot"></div>
-              <span id="status-text">待機中</span>
+              <div class="dot active" id="status-dot"></div>
+              <span id="status-text">狀態：待機中 (靜默備課模式)</span>
             </div>
           </div>
           <div>
-            <div class="section-title">🩺 聽診模式</div>
+            <div class="section-title">器官動態檢視 <span style="font-size: 11px; font-weight: normal; color: #94a3b8;">(點擊展開/收合器官)</span></div>
             <div class="btn-group-audio">
-              <button class="btn-mode active-heart" id="mode-heart">❤️ 心臟</button>
-              <button class="btn-mode" id="mode-gut">🦠 腸胃</button>
+              <button class="btn-mode" id="mode-heart">❤️ 心臟檢視</button>
+              <button class="btn-mode" id="mode-gut">🫄 腸胃檢視</button>
             </div>
+          </div>
+        </div>
+
+        <!-- 單一角色模型：Q 版全身角色模型 -->
+        <div class="ai-character-card">
+          <div class="ai-char-header">
+            <div class="ai-char-title">
+              <span style="font-size: 20px;">👧</span>
+              <div>
+                <div style="font-size: 13.5px; font-weight: 800; color: #0f172a;">Q 版全身角色模型</div>
+                <div style="font-size: 11px; color: #0284c7; font-family: monospace;">SVG Vector / 2.5D 解剖互動</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button id="btn-export-png" class="btn-ai-pill" title="匯出 Q 版全身角色透明背景超高畫質 PNG">📷 匯出 PNG</button>
+            </div>
+          </div>
+          
+          <div class="ai-char-status-badge">
+            <span class="ai-status-indicator"></span>
+            <span id="char-status-label" style="font-weight: 600;">模型：✨ Q 版雙馬尾少女 (粉紅娃娃鞋．自然下垂)</span>
           </div>
         </div>
 
         <!-- 音量調整 -->
         <div class="volume-box">
-          <span style="font-size: 11px; color: #93c5fd;">🔊 主音量</span>
+          <span style="font-size: 14px; font-weight: 700; color: #0284c7; white-space: nowrap;">🔊 主音量</span>
           <input type="range" class="vol-slider" id="vol-slider" min="0" max="100" value="80">
-          <span id="vol-val" style="font-size: 10px; color: #cbd5e1; width: 30px;">80%</span>
+          <span id="vol-val" style="font-size: 13px; font-weight: bold; color: #475569; width: 40px; text-align: right;">80%</span>
         </div>
 
-        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+        <hr style="border: 0; border-top: 1px solid #e2e8f0;">
 
-        <div>
-          <div class="section-title">🎭 切換角色人物</div>
-          <select class="char-select" id="char-select">
-            <option value="girl">經典 Q 版女孩</option>
-            <option value="doctor">Q 版醫學公仔</option>
-            <option value="hero">粉紅小精靈</option>
-            <option value="upload">📷 上傳本機圖片...</option>
-          </select>
-          <input type="file" id="file-input" accept="image/*">
+        <!-- 心理與情緒狀態 (含自然隨機眨眼生理監測儀) -->
+        <div class="emotion-section-box">
+          <div class="section-title-row">
+            <span style="font-size: 14px; font-weight: 700; color: #0f172a;">情緒與眨眼律動</span>
+            <span id="emotion-badge" class="emotion-status-pill">🧘 平穩放鬆</span>
+          </div>
+          <div class="emotion-grid">
+            <button class="btn-emotion selected" data-emotion="calm" title="平靜放鬆：眨眼自然規律 (約 14~18 次/分)"><span>🧘</span><span>平穩</span></button>
+            <button class="btn-emotion" data-emotion="anxious" title="焦慮緊張：交感神經過度活躍，眨眼次數激增 (約 36~45 次/分 · 快速微顫)"><span>😰</span><span>焦慮</span></button>
+            <button class="btn-emotion" data-emotion="excited" title="亢奮刺激：神經興奮，眨眼高頻敏捷 (約 28~34 次/分 · 雙眨連動)"><span>⚡</span><span>亢奮</span></button>
+            <button class="btn-emotion" data-emotion="sleepy" title="困倦疲憊：腺苷堆積，眨眼緩慢稀疏 (約 7~10 次/分 · 沉重閉合)"><span>🥱</span><span>困倦</span></button>
+            <button class="btn-emotion" data-emotion="joyful" title="舒暢愉悅：血清素分泌良好，眨眼輕快舒適 (約 18~22 次/分)"><span>💖</span><span>舒暢</span></button>
+          </div>
+          <!-- 即時眨眼生理監視儀 -->
+          <div class="blink-monitor-bar">
+            <div class="blink-monitor-header">
+              <span style="display:flex; align-items:center; gap:5px;">
+                <span class="blink-live-dot" id="blink-live-dot"></span>
+                <strong style="color:#334155;">眨眼節律：</strong>
+                <span id="disp-blink-rate-text" style="color:#0284c7; font-weight:700;">14~18 次/分 (自然平穩)</span>
+              </span>
+              <span id="disp-blink-duration-tag" class="blink-meta-tag">閉合 0.13s · 雙眨 16%</span>
+            </div>
+            <div class="blink-activity-meter">
+              <div class="blink-activity-fill" id="blink-activity-fill" style="width: 35%;"></div>
+            </div>
+          </div>
         </div>
 
         <div>
-          <div class="section-title">🥗 營養與生理狀態</div>
+          <div class="section-title">營養狀態</div>
           <div class="nutrition-grid">
-            <button class="btn-nutri selected" data-state="normal"><span>🧘</span><span>一般</span></button>
-            <button class="btn-nutri" data-state="caffeine"><span>☕</span><span>咖啡因</span></button>
-            <button class="btn-nutri" data-state="sugarSpike"><span>🍩</span><span>暴糖</span></button>
-            <button class="btn-nutri" data-state="fiber"><span>🥗</span><span>高纖維</span></button>
-            <button class="btn-nutri" data-state="refinedSugar"><span>🧋</span><span>精緻糖</span></button>
+            <button class="btn-nutri selected" data-state="normal"><span>🍚</span><span>一般狀態</span></button>
+            <button class="btn-nutri" data-state="caffeine"><span>☕</span><span>咖啡因刺激</span></button>
+            <button class="btn-nutri" data-state="sugarSpike"><span>🍩</span><span>暴糖反應</span></button>
+            <button class="btn-nutri" data-state="fiber"><span>🥦</span><span>高纖維消化</span></button>
+            <button class="btn-nutri" data-state="refinedSugar"><span>🧋</span><span>精緻糖消化</span></button>
           </div>
         </div>
 
         <div class="bpm-container">
           <div class="bpm-header">
-            <span>⏱️ 手動 BPM 調整</span>
-            <span id="bpm-val" style="color: #f472b6; font-weight: bold;">72 BPM</span>
+            <span>手動 BPM 調整：<span id="bpm-val" style="color: #db2777; font-size: 16px; font-weight: 900;">72 BPM</span></span>
           </div>
           <div class="bpm-presets">
             <button class="btn-preset" data-bpm="55">😴 靜止 55</button>
@@ -563,26 +927,29 @@
             <button class="btn-preset" data-bpm="110">🏃 運動 110</button>
             <button class="btn-preset" data-bpm="140">⚡ 劇烈 140</button>
           </div>
-          <input type="range" class="bpm-slider" id="bpm-slider" min="40" max="160" value="72">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b;">
+            <span>40</span>
+            <input type="range" class="bpm-slider" id="bpm-slider" min="40" max="160" value="72" style="flex: 1;">
+            <span>160</span>
+          </div>
         </div>
 
         <div>
           <div class="section-title">
-            <span>📊 即時波形監視器</span>
-            <span style="font-size: 10px; color: #64748b;" id="wave-status">波形同步中</span>
+            <span>即時波形監視器</span>
           </div>
           <div class="waveform-grid">
             <div class="wave-box">
-              <div class="wave-title" style="color: #fca5a5;">
-                <span>❤️ 心跳波形 ECG</span>
-                <span id="ecg-signal">LIVE</span>
+              <div class="wave-title" style="color: #ef4444;">
+                <span style="font-weight: 800;">心跳監測 (ECG)</span>
+                <span style="font-size: 12px; color: #64748b; font-weight: 600;">增益: 1.0x</span>
               </div>
               <canvas id="canvas-ecg" class="wave-canvas"></canvas>
             </div>
             <div class="wave-box">
-              <div class="wave-title" style="color: #6ee7b7;">
-                <span>🦠 腸胃波形 Borborygmi</span>
-                <span id="gut-signal">LIVE</span>
+              <div class="wave-title" style="color: #10b981;">
+                <span style="font-weight: 800;">腸胃蠕動 (Borborygmi)</span>
+                <span style="font-size: 12px; color: #64748b; font-weight: 600;">增益: 1.0x</span>
               </div>
               <canvas id="canvas-gut" class="wave-canvas"></canvas>
             </div>
@@ -593,12 +960,23 @@
 
       <div class="bottom-info-grid">
         <div class="info-card-sm">
-          <h5>ℹ️ 狀態說明</h5>
-          <p id="nutri-desc">生理指標正常，微血管循環順暢，心率保持基準節奏。</p>
+          <h5>狀態說明</h5>
+          <div style="font-size: 12.5px; line-height: 1.6; color: #475569;">
+            <div>🍚 <strong>一般狀態</strong>：身體處於平衡狀態，心跳與腸胃活動正常。</div>
+            <div>☕ <strong>咖啡因刺激</strong>：心跳加速，神經興奮，可能伴隨焦慮與顫抖。</div>
+            <div>🍩 <strong>暴糖反應</strong>：血糖驟降，心跳緩慢無力，身體感到疲憊。</div>
+            <div>🥦 <strong>高纖維消化</strong>：腸道蠕動順暢，產生健康的咕嚕聲。</div>
+            <div>🧋 <strong>精緻糖消化</strong>：腸道發炎不適，產生斷續不穩定的噪音。</div>
+          </div>
         </div>
         <div class="info-card-sm">
-          <h5>💡 操作提示</h5>
-          <p>• 點擊器官或標籤同步切換聽診<br>• 人物固定定角，畫面清晰穩定<br>• 可快速切換靜止、運動等心率 presets</p>
+          <h5>操作提示</h5>
+          <div style="font-size: 12.5px; line-height: 1.6; color: #475569;">
+            <div>👆 <strong>點擊 3D 模型的心臟或腸胃</strong>來切換聽診焦點。</div>
+            <div>📋 <strong>調整營養狀態</strong>，觀察聲音、波形與角色反應的變化。</div>
+            <div>🔕 <strong>停止監聽時完全靜音</strong>，調整參數不會發出聲音。</div>
+            <div>🎵 <strong>所有聲音均由 Web Audio API 生成</strong>，無外部音檔。</div>
+          </div>
         </div>
       </div>
 
@@ -608,34 +986,54 @@
       <canvas id="three-canvas"></canvas>
 
       <svg id="svg-overlay">
-        <line id="line-heart" class="svg-line" x1="0" y1="0" x2="0" y2="0" />
-        <line id="line-gut" class="svg-line" x1="0" y1="0" x2="0" y2="0" />
+        <line id="line-heart" class="svg-line svg-line-heart" x1="0" y1="0" x2="0" y2="0" />
+        <circle id="dot-heart" class="svg-dot svg-dot-heart" cx="0" cy="0" r="5" />
+        <line id="line-gut" class="svg-line svg-line-gut" x1="0" y1="0" x2="0" y2="0" />
+        <circle id="dot-gut" class="svg-dot svg-dot-gut" cx="0" cy="0" r="5" />
       </svg>
 
-      <div class="floating-card" id="tag-heart">
-        <div style="font-weight: bold; color: #ef4444;">心臟系統 (Heart)</div>
-        <div style="font-size: 9px; color: #94a3b8;">雙重節拍 Lub-Dub</div>
-      </div>
-      <div class="floating-card" id="tag-gut">
-        <div style="font-weight: bold; color: #10b981;">消化系統 (Gut)</div>
-        <div style="font-size: 9px; color: #94a3b8;">蠕動聲 Borborygmi</div>
-      </div>
-
+      <!-- 目前狀態 (Top Right) -->
       <div class="floating-card top-right-status">
-        <div class="status-header">📌 目前狀態面板</div>
-        <div>聽診模式：<span id="disp-mode" style="color:#f472b6;">心臟模式</span></div>
-        <div>營養狀態：<span id="disp-nutri" style="color:#38bdf8;">一般狀態</span></div>
-        <div>即時心率：<span id="disp-bpm" style="color:#fef08a;">72 BPM</span></div>
+        <div class="status-header">目前狀態</div>
+        <div>模式：<span id="disp-mode" style="color:#64748b; font-weight: bold;">👤 全身檢視 (點擊器官展開)</span></div>
+        <div>狀態：<span id="disp-nutri" style="color:#d97706; font-weight: bold;">🥣 一般狀態</span></div>
+        <div>BPM：<span id="disp-bpm" style="color:#0284c7; font-weight: 900; font-size: 16px;">72</span></div>
+        <div>時間：<span id="disp-time" style="font-family: monospace; font-size: 13px; color: #64748b;">12:45:30</span></div>
       </div>
 
+      <!-- 心臟標籤卡片 (Middle Right 1) -->
+      <div class="floating-card organ-card organ-card-heart" id="tag-heart">
+        <div class="organ-card-title">❤️ 心臟</div>
+        <div class="organ-card-sub">點擊展開</div>
+        <div class="organ-card-status">狀態：<span id="disp-heart-status" style="color: #dc2626; font-weight: bold;">活躍</span></div>
+      </div>
+
+      <!-- 腸胃標籤卡片 (Middle Right 2) -->
+      <div class="floating-card organ-card organ-card-gut" id="tag-gut">
+        <div class="organ-card-title">🫁 腸胃</div>
+        <div class="organ-card-sub">點擊展開</div>
+        <div class="organ-card-status">狀態：<span id="disp-gut-status" style="color: #16a34a; font-weight: bold;">穩定</span></div>
+      </div>
+
+      <!-- 角色狀態與情緒 (Bottom Right) -->
       <div class="floating-card bottom-right-status">
-        <div class="status-header">👤 角色生理指標</div>
-        <div>即時表情：<span id="disp-face">😊 舒適平靜</span></div>
-        <div>情緒反應：<span id="disp-emotion">穩健</span></div>
-        <div>系統時間：<span id="disp-time" style="font-family: monospace;">00:00:00</span></div>
+        <div class="status-header">角色狀態與情緒</div>
+        <div><span id="disp-face-icon">😀</span> 表情：<span id="disp-face" style="font-weight: bold; color: #db2777;">正常微笑</span></div>
+        <div>情緒：<span id="disp-emotion" style="font-weight: bold; color: #0284c7;">平穩放鬆</span></div>
+        <div>眨眼：<span id="disp-blink-rate" style="font-weight: bold; color: #7c3aed;"><span class="blink-mini-indicator" id="blink-mini-indicator"></span> 16 次/分 (自然)</span></div>
+        <div>能量：<span id="disp-energy" style="font-weight: bold; color: #d97706;">充沛</span></div>
+        <div>身體：<span id="disp-health" style="font-weight: bold; color: #16a34a;">健康</span></div>
+      </div>
+
+      <!-- 縮放小提示 (Bottom Center/Right) -->
+      <div style="position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(12px); border: 1px solid #e2e8f0; border-radius: 20px; padding: 6px 14px; font-size: 12.5px; color: #475569; display: flex; align-items: center; gap: 6px; pointer-events: none; z-index: 6; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <span>🖱️</span>
+        <span>小提示：可使用滾輪縮放，點擊角色胸口/腹部或右側卡片展開器官</span>
       </div>
 
     </div>
+
+  </div>
 
   </div>
 
@@ -643,27 +1041,1087 @@
     /* ==========================================
        一、資料結構與全域狀態管理
        ========================================== */
+    const DEFAULT_GIRL_SVG = `<svg
+  id="character"
+  viewBox="0 0 600 800"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="全身 Q 版人物 - 雙馬尾 粉紅娃娃鞋 自然下垂"
+>
+  <defs>
+    <!-- 頭髮光澤漸層 -->
+    <linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2d2938" />
+      <stop offset="48%" stop-color="#14151f" />
+      <stop offset="100%" stop-color="#07080d" />
+    </linearGradient>
+
+    <!-- 雙馬尾柔和髮絲漸層 -->
+    <linearGradient id="pigtailLeftGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#343042" />
+      <stop offset="50%" stop-color="#161722" />
+      <stop offset="100%" stop-color="#090a10" />
+    </linearGradient>
+
+    <linearGradient id="pigtailRightGrad" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#343042" />
+      <stop offset="50%" stop-color="#161722" />
+      <stop offset="100%" stop-color="#090a10" />
+    </linearGradient>
+
+    <!-- 髮圈漸層 (粉色蝴蝶結/髮圈) -->
+    <linearGradient id="hairTieGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#db2777" />
+    </linearGradient>
+
+    <!-- 脖子與下巴陰影漸層 -->
+    <linearGradient id="neckGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5c7b3" />
+      <stop offset="35%" stop-color="#fedfd0" />
+      <stop offset="75%" stop-color="#ffe8dc" />
+      <stop offset="100%" stop-color="#ffd5c2" />
+    </linearGradient>
+
+    <!-- 皮膚漸層 -->
+    <linearGradient id="skinGradient" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#fff8f2" />
+      <stop offset="58%" stop-color="#ffe5d7" />
+      <stop offset="100%" stop-color="#ffcbb8" />
+    </linearGradient>
+
+    <!-- 粉色 PUMA 上衣 -->
+    <linearGradient id="shirtGradient" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#ffb6cf" />
+      <stop offset="55%" stop-color="#f88fb5" />
+      <stop offset="100%" stop-color="#e978a0" />
+    </linearGradient>
+
+    <!-- 藍色波浪短褲 -->
+    <linearGradient id="shortsGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#bfe8ff" />
+      <stop offset="52%" stop-color="#8acdf7" />
+      <stop offset="100%" stop-color="#5aa9e7" />
+    </linearGradient>
+
+    <!-- 眼睛剪裁路徑 (確保眼珠高光絕對不超出眼眶) -->
+    <clipPath id="leftEyeClip">
+      <path d="M 223 204 C 233 184 269 182 281 204 C 271 232 233 234 223 204 Z" />
+    </clipPath>
+    <clipPath id="rightEyeClip">
+      <path d="M 331 204 C 343 182 379 184 389 204 C 379 234 341 232 331 204 Z" />
+    </clipPath>
+
+    <!-- 粉紅娃娃鞋漸層 (Patent Leather Pink Doll Shoes) -->
+    <linearGradient id="shoePinkGrad" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0%" stop-color="#fbcfe8" />
+      <stop offset="35%" stop-color="#f472b6" />
+      <stop offset="85%" stop-color="#db2777" />
+      <stop offset="100%" stop-color="#9d174d" />
+    </linearGradient>
+
+    <!-- 娃娃鞋內裡陰影 -->
+    <linearGradient id="shoeInnerGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fda4af" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+
+    <!-- 珍珠/金屬釦漸層 -->
+    <linearGradient id="buckleGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="45%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#eab308" />
+    </linearGradient>
+
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow
+        dx="0"
+        dy="6"
+        stdDeviation="6"
+        flood-color="#0f172a"
+        flood-opacity="0.18"
+      />
+    </filter>
+
+    <filter id="smallShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow
+        dx="0"
+        dy="3"
+        stdDeviation="3"
+        flood-color="#0f172a"
+        flood-opacity="0.12"
+      />
+    </filter>
+
+    <!-- 蕾絲花紋 -->
+    <pattern
+      id="lacePattern"
+      width="28"
+      height="16"
+      patternUnits="userSpaceOnUse"
+    >
+      <path
+        d="M1 5 C7 14 21 14 27 5"
+        fill="none"
+        stroke="#ffffff"
+        stroke-width="2.5"
+      />
+      <circle cx="14" cy="8" r="2.5" fill="#ffffff" />
+    </pattern>
+  </defs>
+
+  <!-- 地面陰影 (半透明深色陰影，完美融入網頁與 3D 背景) -->
+  <ellipse
+    cx="305"
+    cy="745"
+    rx="135"
+    ry="18"
+    fill="#0f172a"
+    opacity="0.20"
+  />
+
+  <!-- ==================== 雙馬尾 (後層) ==================== -->
+  <!-- 左雙馬尾 (主束) -->
+  <path
+    d="
+      M 172 178
+      C 118 195 90 265 98 348
+      C 105 405 125 458 145 492
+      C 152 472 148 430 138 385
+      C 128 335 136 270 162 215
+      C 172 195 182 186 186 182
+      Z
+    "
+    fill="url(#pigtailLeftGrad)"
+    stroke="#22202c"
+    stroke-width="4.5"
+    stroke-linejoin="round"
+  />
+  <!-- 左雙馬尾 (副髮束與飄逸髮絲) -->
+  <path
+    d="
+      M 108 300
+      C 94 360 106 430 132 478
+      C 125 440 120 380 126 325
+      Z
+    "
+    fill="#171822"
+  />
+  <path
+    d="M 125 240 C 108 305 116 385 142 455"
+    fill="none"
+    stroke="#433f52"
+    stroke-width="4"
+    stroke-linecap="round"
+    opacity="0.6"
+  />
+  <path
+    d="M 148 260 C 132 330 138 410 152 470"
+    fill="none"
+    stroke="#655f75"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.45"
+  />
+
+  <!-- 右雙馬尾 (主束) -->
+  <path
+    d="
+      M 436 178
+      C 490 195 518 265 510 348
+      C 503 405 483 458 463 492
+      C 456 472 460 430 470 385
+      C 480 335 472 270 446 215
+      C 436 195 426 186 422 182
+      Z
+    "
+    fill="url(#pigtailRightGrad)"
+    stroke="#22202c"
+    stroke-width="4.5"
+    stroke-linejoin="round"
+  />
+  <!-- 右雙馬尾 (副髮束與飄逸髮絲) -->
+  <path
+    d="
+      M 500 300
+      C 514 360 502 430 476 478
+      C 483 440 488 380 482 325
+      Z
+    "
+    fill="#171822"
+  />
+  <path
+    d="M 483 240 C 500 305 492 385 466 455"
+    fill="none"
+    stroke="#433f52"
+    stroke-width="4"
+    stroke-linecap="round"
+    opacity="0.6"
+  />
+  <path
+    d="M 460 260 C 476 330 470 410 456 470"
+    fill="none"
+    stroke="#655f75"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.45"
+  />
+
+  <!-- 後方頭部頭髮輪廓 (乾淨收於頭部後方，移除垂落至肩頸的多餘髮片) -->
+  <path
+    d="
+      M 174 168
+      C 170 75 230 25 308 30
+      C 395 35 440 95 434 185
+      C 432 225 390 245 350 250
+      L 260 250
+      C 220 245 176 225 174 168
+      Z
+    "
+    fill="url(#hairGradient)"
+    stroke="#24222d"
+    stroke-width="5"
+  />
+
+  <!-- 脖子 (位於頭部後方、肩膀與上衣領口之間，呈現自然圓滑銜接與下巴陰影) -->
+  <g id="neckGroup">
+    <path
+      d="
+        M 276 240
+        L 272 328
+        C 285 342 323 342 336 328
+        L 332 240
+        Z
+      "
+      fill="url(#neckGradient)"
+      stroke="#d69787"
+      stroke-width="3"
+    />
+    <!-- 下巴在頸部的柔和立體陰影 -->
+    <path
+      d="
+        M 274 278
+        C 290 310 318 310 334 278
+        C 324 296 286 296 274 278
+        Z
+      "
+      fill="#e0998a"
+      opacity="0.35"
+    />
+  </g>
+
+  <!-- 耳朵 -->
+  <ellipse
+    cx="185"
+    cy="208"
+    rx="25"
+    ry="34"
+    fill="url(#skinGradient)"
+    stroke="#d99383"
+    stroke-width="3"
+  />
+  <ellipse
+    cx="423"
+    cy="208"
+    rx="25"
+    ry="34"
+    fill="url(#skinGradient)"
+    stroke="#d99383"
+    stroke-width="3"
+  />
+
+  <!-- 臉蛋輪廓 -->
+  <path
+    d="
+      M 184 153
+      C 199 88 260 66 320 68
+      C 386 69 427 110 424 178
+      C 421 253 375 292 307 300
+      C 240 297 195 260 184 198
+      C 181 183 181 167 184 153
+      Z
+    "
+    fill="url(#skinGradient)"
+    stroke="#d69787"
+    stroke-width="4"
+  />
+
+  <!-- 雙馬尾綁帶 (左髮圈蝴蝶結) -->
+  <g transform="translate(172 176) rotate(-15)">
+    <ellipse cx="0" cy="0" rx="14" ry="10" fill="url(#hairTieGrad)" stroke="#be185d" stroke-width="2" />
+    <circle cx="0" cy="0" r="5" fill="#fbcfe8" />
+  </g>
+
+  <!-- 雙馬尾綁帶 (右髮圈蝴蝶結) -->
+  <g transform="translate(436 176) rotate(15)">
+    <ellipse cx="0" cy="0" rx="14" ry="10" fill="url(#hairTieGrad)" stroke="#be185d" stroke-width="2" />
+    <circle cx="0" cy="0" r="5" fill="#fbcfe8" />
+  </g>
+
+  <!-- 齊瀏海 (甜美整齊) -->
+  <path
+    d="
+      M 181 166
+      C 180 95 235 52 311 55
+      C 370 57 413 91 426 149
+      C 399 127 365 110 329 104
+      C 300 99 277 105 250 120
+      C 229 131 208 148 181 166
+      Z
+    "
+    fill="url(#hairGradient)"
+    stroke="#24222d"
+    stroke-width="4"
+  />
+
+  <!-- 瀏海髮束細節 -->
+  <path d="M 232 88 C 247 121 236 152 223 177" fill="none" stroke="#3d3a49" stroke-width="5" stroke-linecap="round" />
+  <path d="M 278 64 C 292 106 278 145 259 172" fill="none" stroke="#3b3946" stroke-width="5" stroke-linecap="round" />
+  <path d="M 328 63 C 335 102 320 141 302 169" fill="none" stroke="#383642" stroke-width="5" stroke-linecap="round" />
+  <path d="M 375 80 C 376 113 359 143 342 169" fill="none" stroke="#34323e" stroke-width="5" stroke-linecap="round" />
+
+  <!-- 頭髮光澤高光 -->
+  <path
+    d="M 221 107 C 252 73 298 61 341 69"
+    fill="none"
+    stroke="#777184"
+    stroke-width="10"
+    stroke-linecap="round"
+    opacity="0.48"
+  />
+  <path
+    d="M 367 83 C 390 98 403 119 410 142"
+    fill="none"
+    stroke="#666173"
+    stroke-width="7"
+    stroke-linecap="round"
+    opacity="0.42"
+  />
+
+  <!-- 眉毛 (柔和自然黑曜眉) -->
+  <path d="M 226 182 C 243 172 264 172 278 180" fill="none" stroke="#18181b" stroke-width="4.5" stroke-linecap="round" />
+  <path d="M 334 180 C 348 172 369 172 386 182" fill="none" stroke="#18181b" stroke-width="4.5" stroke-linecap="round" />
+
+  <!-- 左眼 (純白眼底 + 純黑瞳孔與晶亮白高光，使用 clip-path 保證絕不溢出) -->
+  <g id="leftEye">
+    <!-- 眼白底色 -->
+    <path
+      d="M 223 204 C 233 184 269 182 281 204 C 271 232 233 234 223 204 Z"
+      fill="#ffffff"
+    />
+    <!-- 剪裁內的黑色眼珠與高光 -->
+    <g clip-path="url(#leftEyeClip)">
+      <!-- 純黑眼珠 (深邃漆黑) -->
+      <ellipse cx="253" cy="207" rx="16" ry="20" fill="#18181b" />
+      <circle cx="253" cy="207" r="10" fill="#000000" />
+      <!-- 純白反光晶亮高光 -->
+      <circle cx="247" cy="199" r="5.5" fill="#ffffff" />
+      <circle cx="258" cy="212" r="2.8" fill="#ffffff" />
+      <circle cx="250" cy="218" r="1.5" fill="#ffffff" />
+    </g>
+    <!-- 上眼線與下眼線 (純黑外框) -->
+    <path
+      d="M 223 204 C 233 184 269 182 281 204 C 271 232 233 234 223 204 Z"
+      fill="none"
+      stroke="#18181b"
+      stroke-width="4.5"
+    />
+    <!-- 加厚上眼瞼睫毛線 -->
+    <path d="M 221 204 C 233 183 269 181 283 204" fill="none" stroke="#18181b" stroke-width="5.5" stroke-linecap="round" />
+    <!-- 俏麗側邊小睫毛 -->
+    <path d="M 223 198 L 216 191" stroke="#18181b" stroke-width="3.5" stroke-linecap="round" />
+  </g>
+
+  <!-- 右眼 (純白眼底 + 純黑瞳孔與晶亮白高光，使用 clip-path 保證絕不溢出) -->
+  <g id="rightEye">
+    <!-- 眼白底色 -->
+    <path
+      d="M 331 204 C 343 182 379 184 389 204 C 379 234 341 232 331 204 Z"
+      fill="#ffffff"
+    />
+    <!-- 剪裁內的黑色眼珠與高光 -->
+    <g clip-path="url(#rightEyeClip)">
+      <!-- 純黑眼珠 (深邃漆黑) -->
+      <ellipse cx="359" cy="207" rx="16" ry="20" fill="#18181b" />
+      <circle cx="359" cy="207" r="10" fill="#000000" />
+      <!-- 純白反光晶亮高光 -->
+      <circle cx="353" cy="199" r="5.5" fill="#ffffff" />
+      <circle cx="364" cy="212" r="2.8" fill="#ffffff" />
+      <circle cx="356" cy="218" r="1.5" fill="#ffffff" />
+    </g>
+    <!-- 上眼線與下眼線 (純黑外框) -->
+    <path
+      d="M 331 204 C 343 182 379 184 389 204 C 379 234 341 232 331 204 Z"
+      fill="none"
+      stroke="#18181b"
+      stroke-width="4.5"
+    />
+    <!-- 加厚上眼瞼睫毛線 -->
+    <path d="M 329 204 C 343 181 379 183 391 204" fill="none" stroke="#18181b" stroke-width="5.5" stroke-linecap="round" />
+    <!-- 俏麗側邊小睫毛 -->
+    <path d="M 389 198 L 396 191" stroke="#18181b" stroke-width="3.5" stroke-linecap="round" />
+  </g>
+
+  <!-- 鼻子 -->
+  <path d="M 305 216 C 302 221 303 226 308 227" fill="none" stroke="#d99889" stroke-width="3" stroke-linecap="round" />
+
+  <!-- 腮紅 -->
+  <ellipse cx="224" cy="238" rx="22" ry="10" fill="#ff9ca4" opacity="0.32" />
+  <ellipse cx="388" cy="238" rx="22" ry="10" fill="#ff9ca4" opacity="0.32" />
+
+  <!-- 微笑嘴巴 -->
+  <path d="M 280 248 C 301 267 329 264 344 246" fill="none" stroke="#ad5d63" stroke-width="4" stroke-linecap="round" />
+
+  <!-- ==================== 手臂自然下垂 (兩側對稱垂放) ==================== -->
+  <!-- 左手臂 (自然下垂) -->
+  <g id="leftArmGroup">
+    <path
+      d="
+        M 218 360
+        C 200 395 198 440 206 480
+        C 208 495 218 498 226 492
+        C 234 485 238 460 240 425
+        L 242 368
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- 左手手掌與放鬆手指 (自然垂於身側) -->
+    <path
+      d="
+        M 206 480
+        C 206 498 212 510 220 508
+        C 228 506 230 495 226 485
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="3"
+    />
+  </g>
+
+  <!-- 右手臂 (自然下垂) -->
+  <g id="rightArmGroup">
+    <path
+      d="
+        M 390 360
+        C 408 395 410 440 402 480
+        C 400 495 390 498 382 492
+        C 374 485 370 460 368 425
+        L 366 368
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- 右手手掌與放鬆手指 (自然垂於身側) -->
+    <path
+      d="
+        M 402 480
+        C 402 498 396 510 388 508
+        C 380 506 378 495 382 485
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="3"
+    />
+  </g>
+
+  <!-- 上衣主體 (粉色 PUMA T-Shirt) -->
+  <path
+    d="
+      M 237 319
+      C 255 307 277 306 303 311
+      C 324 307 356 309 377 321
+      L 405 353
+      L 381 392
+      L 373 454
+      C 338 469 274 469 235 454
+      L 231 392
+      L 204 357
+      Z
+    "
+    fill="url(#shirtGradient)"
+    stroke="#cb678c"
+    stroke-width="4"
+    filter="url(#smallShadow)"
+  />
+
+  <!-- 左袖口 -->
+  <path
+    d="M 236 324 C 220 325 207 339 201 357 L 231 382 L 247 343 Z"
+    fill="#f68caf"
+    stroke="#cb678c"
+    stroke-width="4"
+  />
+
+  <!-- 右袖口 -->
+  <path
+    d="M 372 322 C 390 327 401 339 407 356 L 382 384 L 365 344 Z"
+    fill="#f68caf"
+    stroke="#cb678c"
+    stroke-width="4"
+  />
+
+  <!-- 領口 -->
+  <path d="M 273 316 C 283 335 325 337 339 315" fill="none" stroke="#ce668b" stroke-width="6" />
+  <path d="M 278 316 C 289 327 320 328 334 315" fill="none" stroke="#ffc4d7" stroke-width="3" />
+
+  <!-- 上衣皺褶 -->
+  <path d="M 258 365 C 269 390 266 421 260 448" fill="none" stroke="#e6759d" stroke-width="3" opacity="0.55" />
+  <path d="M 349 365 C 339 395 345 426 350 450" fill="none" stroke="#e6759d" stroke-width="3" opacity="0.55" />
+
+  <!-- 胸前 PUMA Logo 與跳躍美洲豹 -->
+  <g transform="translate(0 2)">
+    <text
+      x="303"
+      y="376"
+      text-anchor="middle"
+      fill="#ffffff"
+      font-family="Arial Black, Arial, sans-serif"
+      font-size="28"
+      font-weight="900"
+      letter-spacing="-1"
+    >
+      PUMA
+    </text>
+
+    <!-- 簡化跳躍貓形裝飾 -->
+    <g fill="#ffffff" transform="translate(336 340) scale(0.54)">
+      <ellipse cx="19" cy="12" rx="20" ry="7" transform="rotate(-14 19 12)" />
+      <circle cx="39" cy="4" r="7" />
+      <polygon points="36,-3 39,-11 43,-1" />
+      <path d="M 1 14 C -12 16 -17 9 -24 5" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
+      <path d="M 11 17 L -3 29" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
+      <path d="M 31 14 L 47 24" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
+    </g>
+  </g>
+
+  <!-- 短褲本體 -->
+  <path
+    d="
+      M 235 448
+      C 271 440 341 441 375 449
+      L 388 544
+      C 366 553 338 552 311 544
+      C 285 554 253 553 228 543
+      Z
+    "
+    fill="url(#shortsGradient)"
+    stroke="#438bc5"
+    stroke-width="4"
+    filter="url(#smallShadow)"
+  />
+
+  <!-- 腰頭 -->
+  <path d="M 237 448 C 270 459 344 458 374 448" fill="none" stroke="#68afe3" stroke-width="14" />
+
+  <!-- 腰部鬆緊皺褶 -->
+  <g stroke="#3f91ca" stroke-width="2" opacity="0.65">
+    <path d="M 252 446 L 251 462" />
+    <path d="M 266 448 L 265 463" />
+    <path d="M 280 449 L 279 464" />
+    <path d="M 294 449 L 294 464" />
+    <path d="M 322 449 L 322 464" />
+    <path d="M 337 448 L 337 463" />
+    <path d="M 352 447 L 352 462" />
+  </g>
+
+  <!-- 腰帶蝴蝶結 -->
+  <path d="M 304 462 C 282 448 270 458 280 474 C 291 484 301 475 304 466 Z" fill="#9ed8fb" stroke="#3d87be" stroke-width="3" />
+  <path d="M 307 462 C 329 447 343 458 332 475 C 321 484 311 475 307 466 Z" fill="#9ed8fb" stroke="#3d87be" stroke-width="3" />
+  <circle cx="305" cy="464" r="7" fill="#76bbe8" stroke="#3d87be" stroke-width="3" />
+  <path d="M 301 470 L 292 508" fill="none" stroke="#5aa5d8" stroke-width="6" stroke-linecap="round" />
+  <path d="M 310 470 L 320 509" fill="none" stroke="#5aa5d8" stroke-width="6" stroke-linecap="round" />
+
+  <!-- 短褲中央分線 -->
+  <path d="M 308 466 C 306 493 308 520 311 544" fill="none" stroke="#418fc8" stroke-width="3" />
+
+  <!-- 短褲抓皺 -->
+  <g fill="none" stroke="#d6f2ff" stroke-width="2" opacity="0.55">
+    <path d="M 250 470 C 259 491 257 514 252 535" />
+    <path d="M 276 469 C 283 492 281 518 277 540" />
+    <path d="M 338 469 C 329 493 332 519 337 541" />
+    <path d="M 363 469 C 354 493 358 516 364 536" />
+  </g>
+
+  <!-- 蕾絲花邊底帶 -->
+  <path
+    d="
+      M 229 520
+      C 252 531 282 532 310 522
+      C 336 532 365 533 387 522
+      L 389 547
+      C 366 558 336 557 311 547
+      C 285 558 252 557 227 545
+      Z
+    "
+    fill="url(#lacePattern)"
+    opacity="0.96"
+  />
+
+  <!-- 波浪刺繡下擺 -->
+  <path
+    d="
+      M 228 543
+      C 237 554 247 554 256 543
+      C 266 555 278 555 288 544
+      C 297 556 305 556 312 546
+      C 321 556 332 556 341 545
+      C 351 556 363 555 371 544
+      C 378 552 384 552 389 547
+    "
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+
+  <!-- 左腿 -->
+  <path
+    d="
+      M 255 548
+      C 251 587 252 626 255 662
+      C 257 680 274 691 292 687
+      C 307 684 311 671 307 652
+      L 302 550
+      Z
+    "
+    fill="url(#skinGradient)"
+    stroke="#d69787"
+    stroke-width="4"
+  />
+
+  <!-- 右腿 -->
+  <path
+    d="
+      M 316 550
+      L 324 655
+      C 325 678 338 687 356 681
+      C 373 676 377 660 371 641
+      C 363 610 358 580 359 548
+      Z
+    "
+    fill="url(#skinGradient)"
+    stroke="#d69787"
+    stroke-width="4"
+  />
+
+  <!-- 左襪 (純白中筒襪) -->
+  <path
+    d="
+      M 255 637
+      C 268 646 290 645 306 638
+      L 310 703
+      C 292 713 267 712 252 700
+      Z
+    "
+    fill="#fbfdff"
+    stroke="#cbd4df"
+    stroke-width="3"
+  />
+
+  <!-- 右襪 (純白中筒襪) -->
+  <path
+    d="
+      M 326 636
+      C 338 645 359 643 371 634
+      L 379 697
+      C 363 708 339 710 323 699
+      Z
+    "
+    fill="#fbfdff"
+    stroke="#cbd4df"
+    stroke-width="3"
+  />
+
+  <!-- 襪子羅紋細節 -->
+  <g stroke="#d9e0e8" stroke-width="2">
+    <path d="M 263 647 L 260 694" />
+    <path d="M 274 649 L 272 701" />
+    <path d="M 286 648 L 286 702" />
+    <path d="M 297 646 L 301 697" />
+    <path d="M 336 647 L 334 700" />
+    <path d="M 348 647 L 349 704" />
+    <path d="M 359 644 L 364 700" />
+  </g>
+
+  <!-- 襪口荷葉蕾絲邊飾 (Ankle Lace Scallop) -->
+  <g fill="#ffffff" stroke="#cbd4df" stroke-width="1.5">
+    <!-- 左腳蕾絲波浪 -->
+    <path d="M 248 693 C 253 686 261 688 266 695 C 272 687 280 688 285 696 C 291 688 299 689 304 697 C 310 689 317 692 319 700 L 314 705 C 300 701 262 699 248 693 Z" fill="#ffffff" />
+    <!-- 右腳蕾絲波浪 -->
+    <path d="M 321 694 C 326 686 334 688 339 695 C 345 687 353 688 358 696 C 364 688 372 689 377 697 C 383 689 390 692 392 700 L 387 705 C 373 701 335 699 321 694 Z" fill="#ffffff" />
+  </g>
+
+  <!-- ==================== 粉紅娃娃鞋 (Pink Mary Jane Doll Shoes - 精緻比例・自然分開不重疊) ==================== -->
+  <!-- 左娃娃鞋 -->
+  <g filter="url(#softShadow)">
+    <!-- 鞋身主體 (圓頭瑪莉珍娃娃鞋) -->
+    <path
+      d="
+        M 256 704
+        C 268 696 290 696 302 706
+        C 310 716 310 730 300 740
+        C 288 747 262 747 250 739
+        C 242 729 245 715 256 704
+        Z
+      "
+      fill="url(#shoePinkGrad)"
+      stroke="#be185d"
+      stroke-width="3"
+    />
+    <!-- 娃娃鞋內側低開口鞋口 -->
+    <path
+      d="
+        M 260 703
+        C 272 698 288 699 298 707
+        C 292 716 274 717 265 713
+        C 258 709 257 705 260 703
+        Z
+      "
+      fill="url(#shoeInnerGrad)"
+      stroke="#9d174d"
+      stroke-width="1.8"
+    />
+    <!-- 娃娃鞋漆皮弧形高光 (Patent Leather Sheen) -->
+    <path
+      d="
+        M 252 728
+        C 260 738 286 740 300 733
+        C 288 737 263 735 256 726
+        Z
+      "
+      fill="#ffffff"
+      opacity="0.65"
+    />
+    <path
+      d="M 270 736 C 280 738 293 734 298 729"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+      opacity="0.8"
+    />
+    <!-- 瑪莉珍橫向一字帶 (Instep Strap) -->
+    <path
+      d="M 258 709 C 272 706 288 712 296 716"
+      fill="none"
+      stroke="#db2777"
+      stroke-width="4.5"
+      stroke-linecap="round"
+    />
+    <path
+      d="M 258 709 C 272 706 288 712 296 716"
+      fill="none"
+      stroke="#fbcfe8"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+    <!-- 金屬珍珠釦飾 (外側) -->
+    <circle cx="258" cy="709" r="4" fill="url(#buckleGold)" stroke="#b45309" stroke-width="1.2" />
+    <circle cx="257" cy="707" r="1.2" fill="#ffffff" />
+    <!-- 鞋頭精緻小蝴蝶結 -->
+    <g transform="translate(288, 727) rotate(-10)">
+      <path d="M 0 0 C -6 -5 -8 2 -1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <path d="M 0 0 C 6 -5 8 2 1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <circle cx="0" cy="0.8" r="2.2" fill="url(#buckleGold)" stroke="#b45309" stroke-width="0.8" />
+    </g>
+    <!-- 娃娃鞋深色薄底 -->
+    <path
+      d="M 248 737 C 263 746 289 746 302 738"
+      fill="none"
+      stroke="#831843"
+      stroke-width="3.5"
+      stroke-linecap="round"
+    />
+  </g>
+
+  <!-- 右娃娃鞋 -->
+  <g filter="url(#softShadow)">
+    <!-- 鞋身主體 (圓頭瑪莉珍娃娃鞋) -->
+    <path
+      d="
+        M 326 706
+        C 338 696 360 696 372 704
+        C 383 715 386 729 378 739
+        C 366 747 340 747 328 740
+        C 318 730 318 716 326 706
+        Z
+      "
+      fill="url(#shoePinkGrad)"
+      stroke="#be185d"
+      stroke-width="3"
+    />
+    <!-- 娃娃鞋內側低開口鞋口 -->
+    <path
+      d="
+        M 330 707
+        C 340 699 356 698 368 703
+        C 371 705 370 709 363 713
+        C 354 717 336 716 330 707
+        Z
+      "
+      fill="url(#shoeInnerGrad)"
+      stroke="#9d174d"
+      stroke-width="1.8"
+    />
+    <!-- 娃娃鞋漆皮弧形高光 (Patent Leather Sheen) -->
+    <path
+      d="
+        M 328 733
+        C 342 740 368 738 376 728
+        C 372 735 347 737 335 726
+        Z
+      "
+      fill="#ffffff"
+      opacity="0.65"
+    />
+    <path
+      d="M 330 729 C 335 734 348 738 358 736"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+      opacity="0.8"
+    />
+    <!-- 瑪莉珍橫向一字帶 (Instep Strap) -->
+    <path
+      d="M 332 716 C 340 712 356 706 370 709"
+      fill="none"
+      stroke="#db2777"
+      stroke-width="4.5"
+      stroke-linecap="round"
+    />
+    <path
+      d="M 332 716 C 340 712 356 706 370 709"
+      fill="none"
+      stroke="#fbcfe8"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+    <!-- 金屬珍珠釦飾 (外側) -->
+    <circle cx="370" cy="709" r="4" fill="url(#buckleGold)" stroke="#b45309" stroke-width="1.2" />
+    <circle cx="369" cy="707" r="1.2" fill="#ffffff" />
+    <!-- 鞋頭精緻小蝴蝶結 -->
+    <g transform="translate(340, 727) rotate(10)">
+      <path d="M 0 0 C -6 -5 -8 2 -1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <path d="M 0 0 C 6 -5 8 2 1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <circle cx="0" cy="0.8" r="2.2" fill="url(#buckleGold)" stroke="#b45309" stroke-width="0.8" />
+    </g>
+    <!-- 娃娃鞋深色薄底 -->
+    <path
+      d="M 326 738 C 339 746 365 746 380 737"
+      fill="none"
+      stroke="#831843"
+      stroke-width="3.5"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>
+`;
+
+    const REALISTIC_HEART_SVG = `<svg viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 1. 主動脈與動脈幹 (充氧動脈血：亮鮮紅) -->
+    <linearGradient id="arterialAorta" x1="260" y1="80" x2="480" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff667a"/>
+      <stop offset="35%" stop-color="#e32243"/>
+      <stop offset="80%" stop-color="#a6112d"/>
+      <stop offset="100%" stop-color="#610719"/>
+    </linearGradient>
+
+    <!-- 2. 靜脈與肺動脈 (真實缺氧血：深紫紅/暗酒紅，非藍色) -->
+    <linearGradient id="venousRed" x1="210" y1="100" x2="420" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#b83750"/>
+      <stop offset="35%" stop-color="#8a1c32"/>
+      <stop offset="80%" stop-color="#540b1b"/>
+      <stop offset="100%" stop-color="#33040e"/>
+    </linearGradient>
+
+    <!-- 3. 右心室前壁肌肉 (心肌粉紅至深紅) -->
+    <linearGradient id="rvGrad" x1="240" y1="280" x2="440" y2="560" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f24660"/>
+      <stop offset="45%" stop-color="#c91a3a"/>
+      <stop offset="85%" stop-color="#800b23"/>
+      <stop offset="100%" stop-color="#4a0312"/>
+    </linearGradient>
+
+    <!-- 4. 左心室壁與心尖 (深邃心肌紅) -->
+    <linearGradient id="lvGrad" x1="380" y1="330" x2="540" y2="610" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d92343"/>
+      <stop offset="50%" stop-color="#990f28"/>
+      <stop offset="100%" stop-color="#45020f"/>
+    </linearGradient>
+
+    <!-- 5. 右心房 (Right Atrium) -->
+    <linearGradient id="raGrad" x1="170" y1="240" x2="290" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fa5772"/>
+      <stop offset="55%" stop-color="#cc1f3f"/>
+      <stop offset="100%" stop-color="#780a22"/>
+    </linearGradient>
+
+    <!-- 6. 冠狀動脈 (鮮亮朱紅) -->
+    <linearGradient id="coronaryArt" x1="320" y1="320" x2="470" y2="580" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffe2b8"/>
+      <stop offset="30%" stop-color="#ff3b56"/>
+      <stop offset="100%" stop-color="#8a0c22"/>
+    </linearGradient>
+
+    <!-- 7. 冠狀靜脈 (真實暗紫酒紅) -->
+    <linearGradient id="coronaryVeinReal" x1="320" y1="320" x2="470" y2="580" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c2445e"/>
+      <stop offset="50%" stop-color="#690f22"/>
+      <stop offset="100%" stop-color="#36020c"/>
+    </linearGradient>
+
+    <!-- 左上方 45 度自然高光 -->
+    <linearGradient id="naturalHighlight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ================= 1. 背景實心底層（防止透光） ================= -->
+  <path d="M220 200 C220 150 460 130 480 250 C540 380 540 560 460 620 C360 620 220 540 200 400 Z" 
+        fill="#5c0617"/>
+
+  <!-- ================= 2. 後層大血管（上腔靜脈、肺動脈分支、肺靜脈） ================= -->
+  <g id="posterior-vessels">
+    <!-- 上腔靜脈 Superior Vena Cava (暗酒紅靜脈血色) -->
+    <path d="M245 125 C242 180 246 225 256 265 L302 258 C294 215 290 170 294 120 C278 115 260 118 245 125 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- 右肺動脈分支 Right Pulmonary Artery -->
+    <path d="M295 245 C265 240 230 248 210 260 L218 285 C240 272 270 268 298 270 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="4.5"/>
+
+    <!-- 左肺靜脈 Left Pulmonary Veins (充氧血：鮮紅) -->
+    <path d="M465 255 C490 250 518 260 532 276 L518 296 C500 284 480 282 460 285 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4"/>
+    <path d="M455 298 C480 295 508 305 522 322 L505 340 C490 328 472 322 450 326 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4"/>
+
+    <!-- 右肺靜脈 Right Pulmonary Veins (充氧血：鮮紅) -->
+    <path d="M205 285 C182 280 155 290 142 308 L158 322 C172 310 192 308 215 310 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4"/>
+  </g>
+
+  <!-- ================= 3. 主動脈弓及三大分支 (Aortic Arch) ================= -->
+  <g id="aortic-arch">
+    <!-- 升主動脈根部 -->
+    <path d="M285 240 C280 205 320 175 375 195 L375 320 C320 330 285 300 285 240 Z" 
+          fill="url(#arterialAorta)"/>
+
+    <!-- 1. 頭臂幹 (Brachiocephalic) -->
+    <path d="M305 165 L288 78 C288 68 308 64 316 76 L335 152 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4.5" stroke-linejoin="round"/>
+    <!-- 2. 左頸總動脈 (Left Common Carotid) -->
+    <path d="M352 142 L362 65 C364 57 384 57 386 65 L382 132 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4.5" stroke-linejoin="round"/>
+    <!-- 3. 左鎖骨下動脈 (Left Subclavian) -->
+    <path d="M400 135 L430 70 C432 62 452 66 448 76 L425 142 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- 主動脈弓本體 -->
+    <path d="M290 235 C280 150 365 95 450 130 C492 152 502 210 465 280 L418 258 C442 210 435 174 408 160 C355 132 320 170 325 235 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ================= 4. 肺動脈幹 (Pulmonary Trunk - 深暗紫紅血管) ================= -->
+  <g id="pulmonary-artery">
+    <!-- 左肺動脈分支 -->
+    <path d="M375 195 C420 185 472 192 510 212 L496 238 C460 225 420 220 382 228 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="4.5"/>
+    
+    <!-- 肺動脈幹主體 -->
+    <path d="M305 345 C298 255 345 195 415 205 C410 230 400 255 380 275 C345 255 330 280 320 348 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="5"/>
+    <path d="M295 355 C302 275 350 220 408 235 C390 285 355 335 310 365 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="5"/>
+  </g>
+
+  <!-- ================= 5. 心房結構 (Atria & Auricles) ================= -->
+  <g id="atria">
+    <!-- 右心房 Right Atrium -->
+    <path d="M256 260 C205 270 185 310 195 365 C205 410 238 430 268 425 C252 375 248 310 268 258 Z" 
+          fill="url(#raGrad)" stroke="#450512" stroke-width="5"/>
+
+    <!-- 左心耳 Left Auricle -->
+    <path d="M435 255 C470 265 490 295 480 330 C472 350 455 362 440 362 C448 325 440 285 435 255 Z" 
+          fill="url(#lvGrad)" stroke="#450512" stroke-width="5"/>
+  </g>
+
+  <!-- ================= 6. 心室主體與動脈圓錐 (Ventricles) ================= -->
+  <g id="ventricles">
+    <!-- 動脈圓錐 (Conus Arteriosus) -->
+    <path d="M260 375 C270 325 320 325 335 365 L380 355 C380 355 340 425 260 375 Z" 
+          fill="url(#rvGrad)"/>
+
+    <!-- 心室外廓整體（無任何底部錯誤管道） -->
+    <path d="M268 415 C238 440 242 480 275 515 C320 565 395 605 465 620 C505 628 532 598 538 550 C548 460 548 375 480 340 C430 355 330 335 268 415 Z" 
+          fill="url(#rvGrad)" stroke="#450512" stroke-width="5.5" stroke-linejoin="round"/>
+
+    <!-- 左心室壁外側層次 -->
+    <path d="M375 345 C435 358 480 338 480 338 C548 372 548 458 538 548 C532 595 505 625 465 620 C438 615 408 570 382 530 C338 450 352 378 375 345 Z" 
+          fill="url(#lvGrad)" stroke="#450512" stroke-width="4.5"/>
+  </g>
+
+  <!-- ================= 7. 前室間溝與全紅冠狀血管系統 ================= -->
+  <g id="coronary-circulation">
+    <!-- 前室間溝自然陰影 -->
+    <path d="M326 352 Q362 440 456 612" stroke="#2b0209" stroke-width="12" stroke-linecap="round" opacity="0.35"/>
+
+    <!-- 冠狀溝與血管周圍心外膜脂肪 (Epicardial Fat Pads - 逼真淡黃) -->
+    <ellipse cx="328" cy="365" rx="14" ry="7.5" fill="#fadc8c" opacity="0.65" transform="rotate(-25 328 365)"/>
+    <ellipse cx="372" cy="445" rx="11" ry="6" fill="#fadc8c" opacity="0.5" transform="rotate(30 372 445)"/>
+    <ellipse cx="422" cy="540" rx="9" ry="5" fill="#fadc8c" opacity="0.45" transform="rotate(40 422 540)"/>
+
+    <!-- 心大靜脈 Great Cardiac Vein (真實深暗暗紅) -->
+    <path d="M332 355 Q368 435 454 602" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M362 415 Q398 428 435 438" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M392 495 Q428 510 458 520" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M345 375 Q310 395 285 410" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="2.8" stroke-linecap="round"/>
+
+    <!-- 左前降支冠狀動脈 LAD Artery (鮮亮動脈紅) -->
+    <path d="M324 352 Q356 438 446 608" fill="none" stroke="url(#coronaryArt)" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M344 390 Q305 415 275 440" fill="none" stroke="url(#coronaryArt)" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M295 430 Q275 452 268 475" fill="none" stroke="url(#coronaryArt)" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M370 445 Q410 468 446 478" fill="none" stroke="url(#coronaryArt)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M394 520 Q430 540 458 550" fill="none" stroke="url(#coronaryArt)" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+
+  <!-- ================= 8. 自然高光與光澤 ================= -->
+  <g id="lighting" pointer-events="none">
+    <!-- 主動脈弓高光 -->
+    <path d="M310 170 C320 132 375 118 420 138" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M315 174 C325 140 365 128 405 144" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+
+    <!-- 肺動脈圓錐弧光 -->
+    <path d="M325 285 C340 252 378 238 402 246" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.65"/>
+
+    <!-- 左上方 45 度心肌柔光 -->
+    <path d="M215 310 C205 345 212 385 235 415" fill="none" stroke="url(#naturalHighlight)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M255 425 C242 455 252 485 275 510" fill="none" stroke="url(#naturalHighlight)" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- 心尖 Apex 頂點微光 -->
+    <circle cx="465" cy="615" r="3" fill="#ffffff" opacity="0.9"/>
+  </g>
+</svg>`;
+
     const CHARACTER_PRESETS = {
-      girl: {
-        name: "經典 Q 版女孩",
-        src: "images/girl.png",
-        color: "#f472b6",
-        heart: { x: -0.055, y: 0.23, scale: 0.18 },
-        gut: { x: 0.0, y: -0.08, scale: 0.42 }
-      },
-      doctor: {
-        name: "Q 版醫學公仔",
-        src: "images/doctor.png",
-        color: "#38bdf8",
-        heart: { x: -0.040, y: 0.18, scale: 0.20 },
-        gut: { x: 0.01, y: -0.12, scale: 0.45 }
-      },
-      hero: {
-        name: "粉紅小精靈",
-        src: "images/hero.png",
-        color: "#a855f7",
-        heart: { x: -0.060, y: 0.25, scale: 0.16 },
-        gut: { x: -0.02, y: -0.05, scale: 0.40 }
+      'ai-character': {
+        name: "✨ Q 版雙馬尾少女 (粉紅娃娃鞋．自然下垂)",
+        src: "images/girl.svg",
+        color: "#ec4899",
+        heart: { x: 0.035, y: 0.14, scale: 0.48 },
+        gut: { x: 0.02, y: -0.32, scale: 0.58 }
       }
     };
 
@@ -673,8 +2131,12 @@
         bpm: 72,
         jitter: 0.01,
         breathSpeed: 1.0,
-        face: "😊 舒適平靜",
-        emotion: "穩健",
+        faceIcon: "😊",
+        face: "正常微笑",
+        emotion: "平穩放鬆",
+        emotionId: "calm",
+        energy: "充沛",
+        health: "健康",
         desc: "生理指標正常，微血管循環順暢，心率保持基準節奏。"
       },
       caffeine: {
@@ -682,26 +2144,38 @@
         bpm: 110,
         jitter: 0.04,
         breathSpeed: 1.8,
-        face: "😳 神采奕奕",
-        emotion: "興奮",
-        desc: "中樞神經受到刺激，心肌收縮力增強，心跳加速，血管輕微收縮。"
+        faceIcon: "😳",
+        face: "神采奕奕",
+        emotion: "亢奮刺激",
+        emotionId: "excited",
+        energy: "極高",
+        health: "亢奮",
+        desc: "中樞神經受到刺激，心肌收縮力增強，心跳加速，血管輕微收縮，眨眼敏捷。"
       },
       sugarSpike: {
         name: "暴糖反應",
         bpm: 125,
         jitter: 0.07,
         breathSpeed: 2.2,
-        face: "😵 精神亢奮",
-        emotion: "心悸波動",
-        desc: "血糖劇烈上升，胰島素大量分泌，伴隨輕微心悸感與生理震顫。"
+        faceIcon: "😵",
+        face: "緊張緊繃",
+        emotion: "焦慮緊張",
+        emotionId: "anxious",
+        energy: "過載",
+        health: "波動",
+        desc: "血糖劇烈上升，胰島素大量分泌，伴隨心悸震顫與頻繁急促眨眼。"
       },
       fiber: {
         name: "高纖維消化",
         bpm: 68,
         jitter: 0.01,
         breathSpeed: 0.9,
-        face: "😋 腸道活躍",
-        emotion: "輕鬆消化",
+        faceIcon: "😋",
+        face: "甜美舒暢",
+        emotion: "舒暢愉悅",
+        emotionId: "joyful",
+        energy: "平穩持久",
+        health: "極佳",
         desc: "腸道蠕動明顯，消化液大量分泌，產氣量增多，咕嚕聲音頻繁。"
       },
       refinedSugar: {
@@ -709,20 +2183,326 @@
         bpm: 90,
         jitter: 0.03,
         breathSpeed: 1.3,
-        face: "🥱 血糖起伏",
-        emotion: "沉重疲倦",
-        desc: "腸道滲透壓改變，異常發酵氣體產生，蠕動節律呈現不規則波幅。"
+        faceIcon: "🥱",
+        face: "沉重疲倦",
+        emotion: "困倦疲憊",
+        emotionId: "sleepy",
+        energy: "低落",
+        health: "疲憊",
+        desc: "腸道滲透壓改變，異常發酵氣體產生，眼皮沉重，眨眼緩慢稀疏。"
+      }
+    };
+
+    const EMOTION_CONFIGS = {
+      calm: {
+        id: 'calm',
+        name: '平穩放鬆',
+        icon: '🧘',
+        face: '正常微笑',
+        color: '#0284c7',
+        tagBg: '#e0f2fe',
+        tagColor: '#0369a1',
+        blinkRateDesc: '14~18 次/分 · 自然平穩',
+        blinkInterval: [3.0, 5.4],
+        blinkDuration: [0.12, 0.16],
+        doubleBlinkChance: 0.16,
+        breathSpeed: 1.0,
+        headTilt: 0.035,
+        jitter: 0.01,
+        desc: '身心處於平靜放鬆狀態，副交感神經主導，呼吸舒緩，眨眼頻率自然規律。'
+      },
+      anxious: {
+        id: 'anxious',
+        name: '焦慮緊張',
+        icon: '😰',
+        face: '緊張緊繃',
+        color: '#dc2626',
+        tagBg: '#fee2e2',
+        tagColor: '#b91c1c',
+        blinkRateDesc: '36~45 次/分 · 急促頻繁',
+        blinkInterval: [0.8, 1.7],
+        blinkDuration: [0.08, 0.11],
+        doubleBlinkChance: 0.48,
+        breathSpeed: 2.1,
+        headTilt: 0.065,
+        jitter: 0.06,
+        desc: '交感神經過度活躍，皮質醇與腎上腺素升高，眨眼次數激增且伴隨高頻微顫連眨。'
+      },
+      excited: {
+        id: 'excited',
+        name: '亢奮刺激',
+        icon: '⚡',
+        face: '神采奕奕',
+        color: '#ea580c',
+        tagBg: '#ffedd5',
+        tagColor: '#c2410c',
+        blinkRateDesc: '28~34 次/分 · 高頻敏捷',
+        blinkInterval: [1.2, 2.3],
+        blinkDuration: [0.10, 0.13],
+        doubleBlinkChance: 0.35,
+        breathSpeed: 1.8,
+        headTilt: 0.055,
+        jitter: 0.04,
+        desc: '多巴胺分泌旺盛，中樞神經受到強烈刺激，眼神靈動，眨眼節奏快速俐落。'
+      },
+      sleepy: {
+        id: 'sleepy',
+        name: '困倦疲憊',
+        icon: '🥱',
+        face: '沉重疲倦',
+        color: '#8b5cf6',
+        tagBg: '#ede9fe',
+        tagColor: '#6d28d9',
+        blinkRateDesc: '7~10 次/分 · 緩慢沉重',
+        blinkInterval: [4.8, 8.0],
+        blinkDuration: [0.24, 0.36],
+        doubleBlinkChance: 0.04,
+        breathSpeed: 0.75,
+        headTilt: 0.02,
+        jitter: 0.02,
+        desc: '大腦腺苷堆積，眼輪匝肌張力降低，眨眼間隔顯著拉長且每次閉合時間延長。'
+      },
+      joyful: {
+        id: 'joyful',
+        name: '舒暢愉悅',
+        icon: '💖',
+        face: '甜美舒暢',
+        color: '#ec4899',
+        tagBg: '#fce7f3',
+        tagColor: '#be185d',
+        blinkRateDesc: '18~22 次/分 · 輕快舒暢',
+        blinkInterval: [2.5, 4.4],
+        blinkDuration: [0.11, 0.15],
+        doubleBlinkChance: 0.24,
+        breathSpeed: 1.1,
+        headTilt: 0.045,
+        jitter: 0.015,
+        desc: '血清素水平良好，身心舒暢愉悅，眨眼輕快並伴隨生動的微表情起伏。'
       }
     };
 
     let state = {
       isListening: false,
-      mode: 'heart', // 'heart' | 'gut'
-      currentChar: 'girl',
+      mode: 'none', // 'none' | 'heart' | 'gut'
+      currentChar: 'ai-character',
       nutrition: 'normal',
+      emotion: 'calm',
       bpm: 72,
       volume: 0.8,
       customImgSrc: null
+    };
+
+    /* ==========================================
+       自然隨機眨眼物理與生理學情緒連動引擎 (Blink Engine)
+       ========================================== */
+    const blinkEngine = {
+      state: 'idle', // 'idle' | 'blinking'
+      timer: 0,
+      nextBlinkTime: 2.2,
+      currentDuration: 0.13,
+      closingFraction: 0.35, // 閉合加速階段佔比 (~35%)，睜開彈性回彈佔比 (~65%)
+      minScaleY: 0.05,       // 完全閉眼極限壓縮比例
+      scaleY: 1.0,
+      scaleX: 1.0,
+      isClosed: false,
+      pendingDoubleBlink: false,
+      doubleBlinkChance: 0.16,
+      blinkCount: 0,
+      estimatedBlinkRate: 16,
+      lastBlinkTime: performance.now(),
+
+      // 根據當前情緒模式與即時心率 (BPM) 動態計算隨機眨眼間隔與時長
+      calculateNextInterval() {
+        const emoKey = state.emotion || 'calm';
+        const emo = EMOTION_CONFIGS[emoKey] || EMOTION_CONFIGS.calm;
+
+        const [minInt, maxInt] = emo.blinkInterval || [3.0, 5.4];
+        const [minDur, maxDur] = emo.blinkDuration || [0.12, 0.16];
+
+        // 心率交感神經刺激因子 (BPM 越高，間隔縮短)
+        const bpmRatio = Math.max(0.5, Math.min(2.0, state.bpm / 72));
+        const bpmFactor = 1.0 / Math.pow(bpmRatio, 0.42);
+
+        // Weibull / Poisson 自然生理學非均勻隨機分佈 (偏態長尾)
+        const r1 = Math.random();
+        const r2 = Math.random();
+        const randBias = (r1 * 0.65 + r2 * 0.35);
+
+        let interval = (minInt + randBias * (maxInt - minInt)) * bpmFactor;
+        let duration = minDur + Math.random() * (maxDur - minDur);
+
+        // 當心跳極高 (如運動/劇烈) 時進一步提升雙眨眼微顫機率
+        let doubleChance = emo.doubleBlinkChance;
+        if (state.bpm >= 100) {
+          doubleChance = Math.min(0.55, doubleChance + (state.bpm - 100) * 0.003);
+        }
+
+        this.currentDuration = Math.max(0.07, duration);
+        this.doubleBlinkChance = doubleChance;
+
+        // 計算估計之每分鐘眨眼次數 (次/分)
+        const avgInterval = ((minInt + maxInt) * 0.5 * bpmFactor) + this.currentDuration;
+        const rate = Math.round((60 / Math.max(0.8, avgInterval)) * (1 + doubleChance * 0.45));
+        this.estimatedBlinkRate = rate;
+
+        return Math.max(0.4, interval);
+      },
+
+      setEmotion(emotionKey) {
+        if (EMOTION_CONFIGS[emotionKey]) {
+          state.emotion = emotionKey;
+          // 立即重置下次眨眼計畫，讓使用者能立即看見情緒改變後的眨眼反饋
+          this.nextBlinkTime = Math.min(0.35, this.calculateNextInterval() * 0.25);
+          this.timer = 0;
+          this.updateUI();
+        }
+      },
+
+      update(dt) {
+        this.timer += dt;
+
+        const liveDot = document.getElementById('blink-live-dot');
+        const miniDot = document.getElementById('blink-mini-indicator');
+
+        if (this.state === 'idle') {
+          this.scaleY = 1.0;
+          this.scaleX = 1.0;
+          this.isClosed = false;
+
+          if (liveDot && liveDot.classList.contains('active')) liveDot.classList.remove('active');
+          if (miniDot && miniDot.classList.contains('active')) miniDot.classList.remove('active');
+
+          if (this.timer >= this.nextBlinkTime) {
+            this.state = 'blinking';
+            this.timer = 0;
+            this.blinkCount++;
+            this.lastBlinkTime = performance.now();
+
+            if (liveDot) liveDot.classList.add('active');
+            if (miniDot) miniDot.classList.add('active');
+          }
+        }
+
+        if (this.state === 'blinking') {
+          const progress = Math.min(1.0, this.timer / this.currentDuration);
+          const closePhase = this.closingFraction; // 0.35
+
+          if (progress <= closePhase) {
+            // 閉眼階段：非線性急速向下閉合 (Accelerated Easing)
+            const p = progress / closePhase;
+            const easeIn = Math.pow(p, 1.75);
+            this.scaleY = 1.0 - (1.0 - this.minScaleY) * easeIn;
+            this.scaleX = 1.0 + 0.08 * easeIn; // 眼眶周圍微壓寬度伸展
+            this.isClosed = (p > 0.85);
+          } else {
+            // 睜眼階段：彈性阻尼柔和回彈 (Elastic Decelerating Reopen)
+            const p = (progress - closePhase) / (1.0 - closePhase);
+            const easeOut = Math.sin(p * Math.PI * 0.5);
+            this.scaleY = this.minScaleY + (1.0 - this.minScaleY) * easeOut;
+            this.scaleX = 1.0 + 0.08 * (1.0 - easeOut);
+            this.isClosed = false;
+          }
+
+          if (progress >= 1.0) {
+            this.state = 'idle';
+            this.timer = 0;
+            this.scaleY = 1.0;
+            this.scaleX = 1.0;
+
+            if (liveDot) liveDot.classList.remove('active');
+            if (miniDot) miniDot.classList.remove('active');
+
+            // 觸發雙眨眼 / 微顫連眨 (Double-Blink Flutter)
+            if (this.pendingDoubleBlink) {
+              this.pendingDoubleBlink = false;
+              this.nextBlinkTime = this.calculateNextInterval();
+            } else if (Math.random() < this.doubleBlinkChance) {
+              this.pendingDoubleBlink = true;
+              const emo = EMOTION_CONFIGS[state.emotion || 'calm'] || EMOTION_CONFIGS.calm;
+              this.nextBlinkTime = 0.06 + Math.random() * 0.09;
+              this.currentDuration = emo.blinkDuration[0] * 0.85; // 第二次雙眨更輕脆
+            } else {
+              this.nextBlinkTime = this.calculateNextInterval();
+            }
+          }
+        }
+      },
+
+      updateUI() {
+        const emoKey = state.emotion || 'calm';
+        const emo = EMOTION_CONFIGS[emoKey] || EMOTION_CONFIGS.calm;
+
+        // 更新情緒徽章
+        const badge = document.getElementById('emotion-badge');
+        if (badge) {
+          badge.innerText = `${emo.icon} ${emo.name}`;
+          badge.style.background = emo.tagBg;
+          badge.style.color = emo.tagColor;
+          badge.style.borderColor = emo.color + '40';
+        }
+
+        // 更新左側監測文字
+        const rateText = document.getElementById('disp-blink-rate-text');
+        if (rateText) {
+          rateText.innerText = `${this.estimatedBlinkRate} 次/分 (${emo.name})`;
+          rateText.style.color = emo.color;
+        }
+
+        const metaTag = document.getElementById('disp-blink-duration-tag');
+        if (metaTag) {
+          metaTag.innerText = `閉合 ${(emo.blinkDuration[0]).toFixed(2)}s · 雙眨 ${(this.doubleBlinkChance * 100).toFixed(0)}%`;
+        }
+
+        // 更新活動條
+        const fillBar = document.getElementById('blink-activity-fill');
+        if (fillBar) {
+          const pct = Math.min(100, Math.max(15, (this.estimatedBlinkRate / 45) * 100));
+          fillBar.style.width = `${pct}%`;
+          if (pct > 65) {
+            fillBar.style.background = 'linear-gradient(90deg, #f59e0b, #ef4444)';
+          } else if (pct > 35) {
+            fillBar.style.background = 'linear-gradient(90deg, #0284c7, #8b5cf6)';
+          } else {
+            fillBar.style.background = 'linear-gradient(90deg, #64748b, #8b5cf6)';
+          }
+        }
+
+        // 更新右側角色狀態卡
+        const dispEmotion = document.getElementById('disp-emotion');
+        if (dispEmotion) {
+          dispEmotion.innerText = emo.name;
+          dispEmotion.style.color = emo.color;
+        }
+
+        const dispFace = document.getElementById('disp-face');
+        if (dispFace) {
+          dispFace.innerText = emo.face;
+          dispFace.style.color = emo.color;
+        }
+
+        const dispFaceIcon = document.getElementById('disp-face-icon');
+        if (dispFaceIcon) {
+          dispFaceIcon.innerText = emo.icon;
+        }
+
+        const dispBlinkRate = document.getElementById('disp-blink-rate');
+        if (dispBlinkRate) {
+          const subText = emo.blinkRateDesc.split('·')[1]?.trim() || '自然';
+          dispBlinkRate.innerHTML = `<span class="blink-mini-indicator" id="blink-mini-indicator"></span> ${this.estimatedBlinkRate} 次/分 (${subText})`;
+          dispBlinkRate.style.color = emo.color;
+        }
+
+        // 更新按鈕選中樣式
+        document.querySelectorAll('.btn-emotion').forEach(b => {
+          if (b.getAttribute('data-emotion') === emoKey) {
+            b.classList.add('selected');
+            b.style.borderColor = emo.color;
+          } else {
+            b.classList.remove('selected');
+            b.style.borderColor = '';
+          }
+        });
+      }
     };
 
     /* ==========================================
@@ -831,136 +2611,1726 @@
     }
 
     /* ==========================================
-       三、Canvas 2D 解剖器官動態繪製
+       三、Canvas 2D 解剖器官 (CanvasTexture × PlaneGeometry)
        ========================================== */
-    function createHeartCanvas() {
-      const cvs = document.createElement('canvas');
-      cvs.width = 512; cvs.height = 512;
-      const ctx = cvs.getContext('2d');
-
-      ctx.clearRect(0,0,512,512);
-
-      // 主動脈
-      ctx.beginPath();
-      ctx.lineWidth = 24;
-      ctx.strokeStyle = '#ef4444';
-      ctx.arc(256, 180, 50, Math.PI, 0);
-      ctx.stroke();
-
-      // 心肌本體
-      const grad = ctx.createRadialGradient(256, 280, 20, 256, 280, 160);
-      grad.addColorStop(0, '#f87171');
-      grad.addColorStop(0.6, '#dc2626');
-      grad.addColorStop(1, '#991b1b');
-
-      ctx.beginPath();
-      ctx.moveTo(256, 160);
-      ctx.bezierCurveTo(150, 140, 110, 280, 256, 420);
-      ctx.bezierCurveTo(402, 280, 362, 140, 256, 160);
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // 高光細節
-      ctx.beginPath();
-      ctx.arc(220, 220, 30, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      ctx.fill();
-
-      return cvs;
+    function roundedStroke(ctx, color, width) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
     }
 
-    function createGutCanvas() {
-      const cvs = document.createElement('canvas');
-      cvs.width = 512; cvs.height = 512;
-      const ctx = cvs.getContext('2d');
-      ctx.clearRect(0,0,512,512);
+    let realisticHeartImg = null;
+    let isHeartImgLoading = false;
 
-      // 大腸
-      ctx.beginPath();
-      ctx.lineWidth = 36;
-      ctx.strokeStyle = '#15803d';
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.moveTo(140, 360);
-      ctx.lineTo(140, 180);
-      ctx.lineTo(372, 180);
-      ctx.lineTo(372, 360);
-      ctx.stroke();
-
-      // 小腸
-      ctx.beginPath();
-      ctx.lineWidth = 18;
-      ctx.strokeStyle = '#4ade80';
-      ctx.moveTo(180, 240);
-      ctx.bezierCurveTo(300, 220, 180, 300, 320, 280);
-      ctx.bezierCurveTo(180, 320, 300, 360, 240, 340);
-      ctx.stroke();
-
-      // 胃部
-      const grad = ctx.createLinearGradient(160, 120, 300, 220);
-      grad.addColorStop(0, '#fb923c');
-      grad.addColorStop(1, '#f97316');
-
-      ctx.beginPath();
-      ctx.moveTo(180, 120);
-      ctx.bezierCurveTo(300, 100, 340, 220, 220, 220);
-      ctx.bezierCurveTo(160, 220, 140, 140, 180, 120);
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      return cvs;
+    function getOrCreateHeartImage(onLoadCallback) {
+      if (realisticHeartImg) return realisticHeartImg;
+      if (!isHeartImgLoading) {
+        isHeartImgLoading = true;
+        const blob = new Blob([REALISTIC_HEART_SVG], { type: 'image/svg+xml;charset=utf-8' });
+        const url = (window.URL || window.webkitURL || window).createObjectURL(blob);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          realisticHeartImg = img;
+          (window.URL || window.webkitURL || window).revokeObjectURL(url);
+          if (onLoadCallback) onLoadCallback(img);
+        };
+        img.src = url;
+      }
+      return null;
     }
 
-    // 高質感 Procedural 角色產生器 (備用剪影)
+    function drawHeart(ctx, w, h) {
+      ctx.clearRect(0, 0, w, h);
+      const img = getOrCreateHeartImage((loadedImg) => {
+        if (heartMesh && heartMesh.material && heartMesh.material.map) {
+          const tex = heartMesh.material.map;
+          const cvs = tex.image;
+          if (cvs && cvs.getContext) {
+            const c = cvs.getContext('2d');
+            c.clearRect(0, 0, cvs.width, cvs.height);
+            c.drawImage(loadedImg, 0, 0, cvs.width, cvs.height);
+            tex.needsUpdate = true;
+          }
+        }
+      });
+
+      if (img && img.complete && img.naturalWidth > 0) {
+        ctx.drawImage(img, 0, 0, w, h);
+      }
+    }
+
+    function drawDigestive(ctx, w, h) {
+      ctx.clearRect(0, 0, w, h);
+      ctx.save();
+      ctx.translate(w * 0.5, h * 0.47);
+      ctx.shadowColor = "rgba(255,144,117,0.6)";
+      ctx.shadowBlur = 30;
+
+      ctx.beginPath();
+      ctx.moveTo(-22, -325);
+      ctx.bezierCurveTo(-27, -245, -9, -188, 1, -125);
+      roundedStroke(ctx, "#eb7e76", 31);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-19, -325);
+      ctx.bezierCurveTo(-23, -245, -5, -188, 4, -128);
+      roundedStroke(ctx, "rgba(255,203,180,0.7)", 10);
+      ctx.stroke();
+
+      const stomach = new Path2D();
+      stomach.moveTo(0, -151);
+      stomach.bezierCurveTo(72, -183, 163, -132, 168, -48);
+      stomach.bezierCurveTo(171, 25, 128, 68, 76, 80);
+      stomach.bezierCurveTo(18, 94, -20, 63, -31, 26);
+      stomach.bezierCurveTo(-54, -50, 1, -60, 0, -151);
+      stomach.closePath();
+      const sg = ctx.createLinearGradient(-30, -170, 160, 90);
+      sg.addColorStop(0, "#ffb1a2");
+      sg.addColorStop(0.55, "#f2776f");
+      sg.addColorStop(1, "#bc4d60");
+      ctx.fillStyle = sg;
+      ctx.fill(stomach);
+      roundedStroke(ctx, "rgba(125,47,67,0.75)", 11);
+      ctx.stroke(stomach);
+
+      const colon = new Path2D();
+      colon.moveTo(-178, 84);
+      colon.bezierCurveTo(-210, 134, -198, 285, -149, 323);
+      colon.bezierCurveTo(-75, 365, 99, 363, 167, 313);
+      colon.bezierCurveTo(210, 269, 207, 136, 164, 91);
+      colon.bezierCurveTo(110, 51, -116, 48, -178, 84);
+      roundedStroke(ctx, "#db7b70", 47);
+      ctx.stroke(colon);
+      roundedStroke(ctx, "rgba(255,185,164,0.8)", 19);
+      ctx.stroke(colon);
+
+      const loops = [
+        [-123, 116, 125, 116], [126, 151, -123, 151],
+        [-121, 188, 126, 188], [127, 225, -119, 225],
+        [-112, 263, 119, 263], [112, 298, -90, 298],
+      ];
+      loops.forEach(([x1, y1, x2, y2], i) => {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        const bend = i % 2 === 0 ? 44 : -44;
+        ctx.bezierCurveTo(bend, y1 - 19, bend, y2 + 19, x2, y2);
+        roundedStroke(ctx, "#f2a397", 24);
+        ctx.stroke();
+        roundedStroke(ctx, "rgba(255,218,198,0.72)", 7);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    function makeCanvasTexture(draw, width = 768, height = 768) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+      draw(ctx, width, height);
+      const texture = new THREE.CanvasTexture(canvas);
+      if (THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
+      else if (THREE.sRGBEncoding) texture.encoding = THREE.sRGBEncoding;
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = false;
+      texture.needsUpdate = true;
+      return texture;
+    }
+
+    function buildOrgan(texture, width, height, opacity = 1) {
+      const geometry = new THREE.PlaneGeometry(width, height);
+      const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        transparent: true,
+        opacity,
+        alphaTest: 0.025,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        toneMapped: false,
+      });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    // 精緻 Q 版 2.5D 人物角色 Procedural 繪圖引擎 (極致甜美日系 Q 版動漫美少女)
     function createProceduralCharacterCanvas(presetKey) {
       const cvs = document.createElement('canvas');
-      cvs.width = 512; cvs.height = 1024;
+      cvs.width = 1024; cvs.height = 1536;
       const ctx = cvs.getContext('2d');
-      const preset = CHARACTER_PRESETS[presetKey] || CHARACTER_PRESETS.girl;
+      ctx.clearRect(0, 0, 1024, 1536);
 
-      const grad = ctx.createLinearGradient(0, 0, 0, 1024);
-      grad.addColorStop(0, preset.color || '#818cf8');
-      grad.addColorStop(1, '#1e3a8a');
-      ctx.fillStyle = grad;
+      if (presetKey === 'doctor') {
+        // ==========================================
+        // 角色二：Q 版醫學小醫師 (Dr. Little)
+        // ==========================================
+        const aura = ctx.createRadialGradient(512, 700, 100, 512, 700, 650);
+        aura.addColorStop(0, 'rgba(56, 189, 248, 0.25)');
+        aura.addColorStop(1, 'rgba(56, 189, 248, 0)');
+        ctx.fillStyle = aura;
+        ctx.fillRect(0, 0, 1024, 1536);
 
-      // 頭部
-      ctx.beginPath();
-      ctx.arc(256, 220, 110, 0, Math.PI * 2);
-      ctx.fill();
+        const coatGrad = ctx.createLinearGradient(320, 550, 704, 1050);
+        coatGrad.addColorStop(0, '#ffffff');
+        coatGrad.addColorStop(0.6, '#f1f5f9');
+        coatGrad.addColorStop(1, '#e2e8f0');
+        ctx.fillStyle = coatGrad;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(330, 560, 364, 480, 40);
+        else ctx.rect(330, 560, 364, 480);
+        ctx.fill();
 
-      // 軀幹
-      ctx.beginPath();
-      if (ctx.roundRect) {
-        ctx.roundRect(140, 350, 232, 500, 40);
+        ctx.fillStyle = '#0284c7';
+        ctx.beginPath();
+        ctx.moveTo(512, 560); ctx.lineTo(460, 680); ctx.lineTo(512, 780); ctx.lineTo(564, 680);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(390, 1060, 80, 260); ctx.fillRect(554, 1060, 80, 260);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(365, 1310, 130, 65, 20);
+          ctx.roundRect(539, 1310, 130, 65, 20);
+        } else {
+          ctx.rect(365, 1310, 130, 65);
+          ctx.rect(539, 1310, 130, 65);
+        }
+        ctx.fill();
+
+        const faceGrad = ctx.createRadialGradient(490, 370, 40, 512, 380, 200);
+        faceGrad.addColorStop(0, '#fffbfb');
+        faceGrad.addColorStop(0.7, '#fed7aa');
+        faceGrad.addColorStop(1, '#fbc6b0');
+        ctx.fillStyle = faceGrad;
+        ctx.beginPath();
+        ctx.arc(512, 380, 200, 0, Math.PI * 2);
+        ctx.fill();
+
+        const capGrad = ctx.createLinearGradient(300, 160, 724, 280);
+        capGrad.addColorStop(0, '#38bdf8');
+        capGrad.addColorStop(1, '#0284c7');
+        ctx.fillStyle = capGrad;
+        ctx.beginPath();
+        ctx.arc(512, 260, 160, Math.PI * 0.9, Math.PI * 2.1);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(512, 230, 28, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(498, 224, 28, 12); ctx.fillRect(506, 216, 12, 28);
+
+        drawChibiEye(ctx, 430, 385, 36, '#0284c7', '#38bdf8', state.nutrition, '#18181b');
+        drawChibiEye(ctx, 594, 385, 36, '#0284c7', '#38bdf8', state.nutrition, '#18181b');
+        drawBlush(ctx, 370, 430, 30, 'rgba(251, 113, 133, 0.45)');
+        drawBlush(ctx, 654, 430, 30, 'rgba(251, 113, 133, 0.45)');
+        drawMouth(ctx, 512, 450, state.nutrition);
+
+      } else if (presetKey === 'hero') {
+        // ==========================================
+        // 角色三：Q 版粉紅小精靈 (Star Sprite)
+        // ==========================================
+        const fairyAura = ctx.createRadialGradient(512, 700, 100, 512, 700, 700);
+        fairyAura.addColorStop(0, 'rgba(232, 121, 249, 0.3)');
+        fairyAura.addColorStop(1, 'rgba(232, 121, 249, 0)');
+        ctx.fillStyle = fairyAura;
+        ctx.fillRect(0, 0, 1024, 1536);
+
+        const dressGrad = ctx.createLinearGradient(320, 560, 704, 1100);
+        dressGrad.addColorStop(0, '#f472b6');
+        dressGrad.addColorStop(0.5, '#c084fc');
+        dressGrad.addColorStop(1, '#9333ea');
+        ctx.fillStyle = dressGrad;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(340, 580, 344, 480, 45);
+        else ctx.rect(340, 580, 344, 480);
+        ctx.fill();
+
+        ctx.fillStyle = '#fbcfe8';
+        ctx.fillRect(410, 1100, 75, 230); ctx.fillRect(539, 1100, 75, 230);
+
+        ctx.fillStyle = '#a855f7';
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(385, 1290, 120, 70, 20);
+          ctx.roundRect(519, 1290, 120, 70, 20);
+        } else {
+          ctx.rect(385, 1290, 120, 70);
+          ctx.rect(519, 1290, 120, 70);
+        }
+        ctx.fill();
+
+        const elfFaceGrad = ctx.createRadialGradient(490, 370, 40, 512, 380, 200);
+        elfFaceGrad.addColorStop(0, '#fffbfb');
+        elfFaceGrad.addColorStop(0.7, '#fed7aa');
+        elfFaceGrad.addColorStop(1, '#fbcfe8');
+        ctx.fillStyle = elfFaceGrad;
+        ctx.beginPath();
+        ctx.arc(512, 380, 200, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawChibiEye(ctx, 425, 385, 36, '#a855f7', '#f472b6', state.nutrition, '#18181b');
+        drawChibiEye(ctx, 599, 385, 36, '#a855f7', '#f472b6', state.nutrition, '#18181b');
+        drawBlush(ctx, 365, 430, 30, 'rgba(236, 72, 153, 0.45)');
+        drawBlush(ctx, 659, 430, 30, 'rgba(236, 72, 153, 0.45)');
+        drawMouth(ctx, 512, 450, state.nutrition);
+
       } else {
-        ctx.rect(140, 350, 232, 500);
+        // ==========================================
+        // 角色一：精緻日系動漫 Q 版美少女 (Chibi Anime Girl)
+        // 溫和甜美、高解析光影、自然人體比例與萌態
+        // ==========================================
+
+        // 1. 背景柔和微光 (Soft Warm Glow)
+        const bgGlow = ctx.createRadialGradient(512, 700, 100, 512, 700, 650);
+        bgGlow.addColorStop(0, 'rgba(244, 114, 182, 0.15)');
+        bgGlow.addColorStop(0.6, 'rgba(168, 85, 247, 0.06)');
+        bgGlow.addColorStop(1, 'rgba(15, 23, 42, 0)');
+        ctx.fillStyle = bgGlow;
+        ctx.fillRect(0, 0, 1024, 1536);
+
+        // 2. 深曜黑長直髮後髮 (Glossy Jet-Black Long Straight Hair Silhouette)
+        const backHairGrad = ctx.createLinearGradient(330, 250, 694, 800);
+        backHairGrad.addColorStop(0, '#2e2629');
+        backHairGrad.addColorStop(0.35, '#1c1618');
+        backHairGrad.addColorStop(0.8, '#140f11');
+        backHairGrad.addColorStop(1, '#0d0a0b');
+
+        ctx.save();
+        ctx.fillStyle = backHairGrad;
+        ctx.beginPath();
+        // 飽滿後腦勺與及腰垂肩長直髮輪廓 (Long Flowing Straight Hair)
+        ctx.moveTo(330, 320);
+        ctx.bezierCurveTo(240, 370, 230, 520, 250, 720);
+        ctx.bezierCurveTo(260, 800, 320, 850, 512, 850);
+        ctx.bezierCurveTo(704, 850, 764, 800, 774, 720);
+        ctx.bezierCurveTo(794, 520, 784, 370, 694, 320);
+        ctx.closePath();
+        ctx.fill();
+
+        // 長直髮立體光影髮流線條
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(18, 12, 14, 0.5)';
+        // 左側直線髮流
+        ctx.beginPath(); ctx.moveTo(290, 420); ctx.quadraticCurveTo(270, 580, 280, 760); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(330, 400); ctx.quadraticCurveTo(310, 600, 325, 780); ctx.stroke();
+        // 右側直線髮流
+        ctx.beginPath(); ctx.moveTo(734, 420); ctx.quadraticCurveTo(754, 580, 744, 760); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(694, 400); ctx.quadraticCurveTo(714, 600, 699, 780); ctx.stroke();
+
+        // 絲滑亮光細髮絲
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(305, 450); ctx.lineTo(295, 720); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(719, 450); ctx.lineTo(729, 720); ctx.stroke();
+        ctx.restore();
+
+        // 膚色漸層（極致白皙透紅、幼態瓷白膚色）
+        const skinGrad = ctx.createLinearGradient(400, 300, 624, 1200);
+        skinGrad.addColorStop(0, '#ffffff');
+        skinGrad.addColorStop(0.4, '#fff6f3');
+        skinGrad.addColorStop(0.8, '#ffede6');
+        skinGrad.addColorStop(1, '#fedcd2');
+
+        // 3. 雙腿 (Slender Chibi Legs)
+        ctx.save();
+        ctx.fillStyle = skinGrad;
+
+        // 左腿 (圓潤柔順)
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(415, 980, 64, 250, [0, 0, 18, 18]);
+        else ctx.rect(415, 980, 64, 250);
+        ctx.fill();
+
+        // 右腿
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(545, 980, 64, 250, [0, 0, 18, 18]);
+        else ctx.rect(545, 980, 64, 250);
+        ctx.fill();
+
+        // 膝蓋微透紅粉光暈 (Soft Knee Blush)
+        const kneeGradLeft = ctx.createRadialGradient(447, 1090, 2, 447, 1090, 22);
+        kneeGradLeft.addColorStop(0, 'rgba(251, 113, 133, 0.4)');
+        kneeGradLeft.addColorStop(1, 'rgba(251, 113, 133, 0)');
+        ctx.fillStyle = kneeGradLeft;
+        ctx.beginPath(); ctx.arc(447, 1090, 22, 0, Math.PI * 2); ctx.fill();
+
+        const kneeGradRight = ctx.createRadialGradient(577, 1090, 2, 577, 1090, 22);
+        kneeGradRight.addColorStop(0, 'rgba(251, 113, 133, 0.4)');
+        kneeGradRight.addColorStop(1, 'rgba(251, 113, 133, 0)');
+        ctx.fillStyle = kneeGradRight;
+        ctx.beginPath(); ctx.arc(577, 1090, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+
+        // 4. 白色甜美短襪 (Sweet White Socks)
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.08)';
+        ctx.shadowBlur = 6;
+        ctx.shadowOffsetY = 2;
+
+        // 左襪
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(410, 1190, 74, 95, [10, 10, 8, 8]);
+        else ctx.rect(410, 1190, 74, 95);
+        ctx.fill();
+
+        // 右襪
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(540, 1190, 74, 95, [10, 10, 8, 8]);
+        else ctx.rect(540, 1190, 74, 95);
+        ctx.fill();
+
+        // 襪口蕾絲小花邊
+        ctx.shadowColor = 'transparent';
+        ctx.fillStyle = '#fce7f3';
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath(); ctx.arc(419 + i * 19, 1190, 8, Math.PI, 0, false); ctx.fill();
+          ctx.beginPath(); ctx.arc(549 + i * 19, 1190, 8, Math.PI, 0, false); ctx.fill();
+        }
+        ctx.restore();
+
+        // 5. 粉紅漆皮瑪莉珍娃娃鞋 (Patent Pink Mary Jane Doll Shoes with Bows & Buckles)
+        ctx.save();
+        const shoeGrad = ctx.createLinearGradient(380, 1260, 650, 1360);
+        shoeGrad.addColorStop(0, '#fbcfe8');
+        shoeGrad.addColorStop(0.4, '#f472b6');
+        shoeGrad.addColorStop(1, '#db2777');
+
+        // 左鞋身
+        ctx.fillStyle = shoeGrad;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(390, 1265, 105, 65, [24, 28, 16, 16]);
+        else ctx.rect(390, 1265, 105, 65);
+        ctx.fill();
+
+        // 右鞋身
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(529, 1265, 105, 65, [28, 24, 16, 16]);
+        else ctx.rect(529, 1265, 105, 65);
+        ctx.fill();
+
+        // 娃娃鞋深色薄底
+        ctx.fillStyle = '#831843';
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(386, 1320, 112, 14, [4, 4, 10, 10]);
+          ctx.roundRect(526, 1320, 112, 14, [4, 4, 10, 10]);
+        } else {
+          ctx.rect(386, 1320, 112, 14);
+          ctx.rect(526, 1320, 112, 14);
+        }
+        ctx.fill();
+
+        // 瑪莉珍一字橫帶與金屬釦飾
+        ctx.strokeStyle = '#db2777';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(395, 1285); ctx.lineTo(485, 1285);
+        ctx.moveTo(540, 1285); ctx.lineTo(630, 1285);
+        ctx.stroke();
+
+        // 扣飾
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath(); ctx.arc(398, 1285, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(626, 1285, 5, 0, Math.PI * 2); ctx.fill();
+
+        // 鞋頭可愛小蝴蝶結
+        ctx.fillStyle = '#f472b6';
+        ctx.strokeStyle = '#be185d';
+        ctx.lineWidth = 2;
+        // 左鞋蝴蝶結
+        ctx.beginPath(); ctx.ellipse(450, 1276, 8, 4, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(464, 1276, 8, 4, 0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath(); ctx.arc(457, 1276, 3, 0, Math.PI * 2); ctx.fill();
+        // 右鞋蝴蝶結
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath(); ctx.ellipse(560, 1276, 8, 4, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(574, 1276, 8, 4, 0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath(); ctx.arc(567, 1276, 3, 0, Math.PI * 2); ctx.fill();
+
+        ctx.restore();
+
+        // 6. 淺藍色波浪花邊下擺短褲 (Baby-Blue Scalloped Hem Shorts)
+        ctx.save();
+        const shortsGrad = ctx.createLinearGradient(350, 840, 674, 980);
+        shortsGrad.addColorStop(0, '#bae6fd');
+        shortsGrad.addColorStop(0.5, '#7dd3fc');
+        shortsGrad.addColorStop(1, '#38bdf8');
+        ctx.fillStyle = shortsGrad;
+
+        // 短褲褲身
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(368, 850, 288, 110, [14, 14, 20, 20]);
+        else ctx.rect(368, 850, 288, 110);
+        ctx.fill();
+
+        // 褲腿中間自然陰影分割線
+        ctx.strokeStyle = 'rgba(2, 132, 199, 0.4)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(512, 860);
+        ctx.lineTo(512, 955);
+        ctx.stroke();
+
+        // 褲下擺精緻白色波浪花邊 (Wavy Scalloped Lace Trim)
+        ctx.fillStyle = '#ffffff';
+        for (let i = 0; i < 9; i++) {
+          ctx.beginPath();
+          ctx.arc(382 + i * 32.5, 960, 12, 0, Math.PI, false);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // 7. 雙手臂與可愛小手 (Graceful Chibi Arms & Hands)
+        ctx.save();
+        ctx.fillStyle = skinGrad;
+        // 左手臂（自然微張垂落）
+        ctx.beginPath();
+        ctx.moveTo(370, 600);
+        ctx.quadraticCurveTo(300, 720, 275, 830);
+        ctx.quadraticCurveTo(300, 855, 325, 835);
+        ctx.quadraticCurveTo(370, 730, 400, 630);
+        ctx.closePath();
+        ctx.fill();
+
+        // 左手小手掌
+        ctx.beginPath();
+        ctx.ellipse(282, 840, 18, 14, -Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 右手臂
+        ctx.beginPath();
+        ctx.moveTo(654, 600);
+        ctx.quadraticCurveTo(724, 720, 749, 830);
+        ctx.quadraticCurveTo(724, 855, 699, 835);
+        ctx.quadraticCurveTo(654, 730, 624, 630);
+        ctx.closePath();
+        ctx.fill();
+
+        // 右手小手掌
+        ctx.beginPath();
+        ctx.ellipse(742, 840, 18, 14, Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 8. 柔粉色運動短袖 T 恤 (Sweet Pastel Pink T-Shirt)
+        ctx.save();
+        const topGrad = ctx.createLinearGradient(350, 540, 674, 860);
+        topGrad.addColorStop(0, '#fbcfe8');
+        topGrad.addColorStop(0.3, '#f472b6');
+        topGrad.addColorStop(0.8, '#ec4899');
+        topGrad.addColorStop(1, '#db2777');
+        ctx.fillStyle = topGrad;
+
+        // T 恤本體
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(365, 550, 294, 310, [28, 28, 18, 18]);
+        else ctx.rect(365, 550, 294, 310);
+        ctx.fill();
+
+        // 左右小袖子
+        ctx.beginPath();
+        ctx.moveTo(375, 555);
+        ctx.lineTo(295, 645);
+        ctx.lineTo(335, 685);
+        ctx.lineTo(385, 620);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(649, 555);
+        ctx.lineTo(729, 645);
+        ctx.lineTo(689, 685);
+        ctx.lineTo(639, 620);
+        ctx.closePath();
+        ctx.fill();
+
+        // 領口甜美白邊 (Collar)
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.arc(512, 550, 48, 0.15, Math.PI - 0.15, false);
+        ctx.stroke();
+
+        // 胸前精緻 PUMA 經典文字與躍動美洲獅印花 (PUMA Sportswear Print)
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '900 32px "Arial Black", "Impact", sans-serif';
+        ctx.fillText('PUMA', 512, 680);
+
+        // 美洲獅跳躍剪影
+        ctx.beginPath();
+        ctx.moveTo(548, 650);
+        ctx.bezierCurveTo(556, 642, 566, 638, 580, 640);
+        ctx.bezierCurveTo(588, 643, 592, 648, 595, 654);
+        ctx.bezierCurveTo(588, 653, 582, 651, 576, 652);
+        ctx.bezierCurveTo(568, 654, 562, 660, 558, 665);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // 9. 精緻 Q 版小臉蛋 (Ultra-Cute Babyface with Soft Skin Glow)
+        ctx.save();
+        const faceGrad = ctx.createRadialGradient(490, 360, 30, 512, 385, 195);
+        faceGrad.addColorStop(0, '#fffbfb');
+        faceGrad.addColorStop(0.5, '#fff0ec');
+        faceGrad.addColorStop(0.85, '#fed7cc');
+        faceGrad.addColorStop(1, '#fbc6b8');
+        ctx.fillStyle = faceGrad;
+
+        // 微微肉嘟嘟的圓潤少女臉頰 (Soft Cheeks Contour)
+        ctx.beginPath();
+        ctx.moveTo(350, 360);
+        ctx.bezierCurveTo(340, 460, 400, 535, 512, 535);
+        ctx.bezierCurveTo(624, 535, 684, 460, 674, 360);
+        ctx.bezierCurveTo(674, 250, 600, 190, 512, 190);
+        ctx.bezierCurveTo(424, 190, 350, 250, 350, 360);
+        ctx.closePath();
+        ctx.fill();
+
+        // 10. 黑色齊瀏海長直髮 (Glossy Jet-Black Long Straight Hair & Neat Straight Bangs)
+        const frontHairGrad = ctx.createLinearGradient(350, 170, 674, 450);
+        frontHairGrad.addColorStop(0, '#2e2428');
+        frontHairGrad.addColorStop(0.4, '#1c1618');
+        frontHairGrad.addColorStop(1, '#0e0b0c');
+        ctx.fillStyle = frontHairGrad;
+
+        // 頭頂圓潤黑髮基底
+        ctx.beginPath();
+        ctx.arc(512, 345, 190, Math.PI * 0.96, Math.PI * 2.04, false);
+        ctx.lineTo(705, 360);
+        // 整齊厚實的齊瀏海外廓 (Neat Blunt Bangs Line)
+        ctx.quadraticCurveTo(615, 380, 512, 376);
+        ctx.quadraticCurveTo(408, 380, 319, 360);
+        ctx.closePath();
+        ctx.fill();
+
+        // 兩側長垂肩鬢髮 (Straight Side Hair Strands)
+        // 左側長直垂肩鬢髮
+        ctx.beginPath();
+        ctx.moveTo(320, 340);
+        ctx.quadraticCurveTo(285, 450, 310, 620);
+        ctx.quadraticCurveTo(345, 620, 355, 365);
+        ctx.closePath();
+        ctx.fill();
+
+        // 右側長直垂肩鬢髮
+        ctx.beginPath();
+        ctx.moveTo(704, 340);
+        ctx.quadraticCurveTo(739, 450, 714, 620);
+        ctx.quadraticCurveTo(679, 620, 669, 365);
+        ctx.closePath();
+        ctx.fill();
+
+        // --- 豐富精緻的黑髮髮絲線條系統 (Detailed Anime Hair Strands & Linework) ---
+        ctx.lineCap = 'round';
+
+        // 1. 頭頂與後腦勺的自然髮流線 (Crown Flow Curves)
+        ctx.strokeStyle = 'rgba(18, 12, 14, 0.6)';
+        ctx.lineWidth = 2.5;
+        // 左側髮流
+        ctx.beginPath(); ctx.moveTo(505, 160); ctx.quadraticCurveTo(430, 200, 360, 270); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(500, 175); ctx.quadraticCurveTo(410, 230, 340, 320); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(512, 190); ctx.quadraticCurveTo(440, 250, 380, 330); ctx.stroke();
+        // 右側髮流
+        ctx.beginPath(); ctx.moveTo(519, 160); ctx.quadraticCurveTo(594, 200, 664, 270); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(524, 175); ctx.quadraticCurveTo(614, 230, 684, 320); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(512, 190); ctx.quadraticCurveTo(584, 250, 644, 330); ctx.stroke();
+
+        // 2. 整齊齊瀏海分束線條 (Blunt Bangs Definition Lines)
+        ctx.strokeStyle = 'rgba(14, 10, 11, 0.7)';
+        ctx.lineWidth = 2.8;
+        // 瀏海分束縫隙與垂直自然垂墜線
+        ctx.beginPath(); ctx.moveTo(415, 270); ctx.quadraticCurveTo(416, 330, 412, 378); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(462, 260); ctx.quadraticCurveTo(464, 325, 460, 376); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(512, 255); ctx.quadraticCurveTo(512, 320, 510, 375); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(562, 260); ctx.quadraticCurveTo(560, 325, 564, 376); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(609, 270); ctx.quadraticCurveTo(608, 330, 612, 378); ctx.stroke();
+
+        // 3. 兩側長鬢角線條 (Side Cheek Strands & Whisps)
+        ctx.strokeStyle = 'rgba(14, 10, 11, 0.5)';
+        ctx.lineWidth = 2.5;
+        // 左鬢角線條
+        ctx.beginPath(); ctx.moveTo(330, 350); ctx.quadraticCurveTo(300, 470, 315, 600); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(345, 360); ctx.quadraticCurveTo(320, 470, 335, 580); ctx.stroke();
+        // 右鬢角線條
+        ctx.beginPath(); ctx.moveTo(694, 350); ctx.quadraticCurveTo(724, 470, 709, 600); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(679, 360); ctx.quadraticCurveTo(704, 470, 689, 580); ctx.stroke();
+
+        // 4. 頭頂高光天使光環與細膩光澤筆觸 (Silver-White Glossy Halo Ring)
+        // 主光環
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(512, 305, 155, Math.PI * 1.2, Math.PI * 1.8, false);
+        ctx.stroke();
+
+        // 細緻高光髮絲筆觸 (Specular Strand Highlights)
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(420, 298); ctx.lineTo(435, 292); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(450, 285); ctx.lineTo(470, 280); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(495, 275); ctx.lineTo(529, 275); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(554, 280); ctx.lineTo(574, 285); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(589, 292); ctx.lineTo(604, 298); ctx.stroke();
+
+        // 6. 俏皮微翹細髮絲與主呆毛 (Chibi Ahoge & Flick Strands)
+        // 主呆毛 (頭頂向上輕揚)
+        ctx.strokeStyle = '#5a4238';
+        ctx.lineWidth = 4.5;
+        ctx.beginPath();
+        ctx.moveTo(512, 160);
+        ctx.quadraticCurveTo(538, 110, 565, 130);
+        ctx.stroke();
+
+        // 次呆毛 (微彎小細絲)
+        ctx.strokeStyle = '#664a3d';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(512, 160);
+        ctx.quadraticCurveTo(490, 125, 475, 140);
+        ctx.stroke();
+
+        // 左側俏皮微翹小髮尾 (Left Cute Flick)
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(318, 440);
+        ctx.quadraticCurveTo(285, 455, 280, 480);
+        ctx.stroke();
+
+        // 右側俏皮微翹小髮尾 (Right Cute Flick)
+        ctx.beginPath();
+        ctx.moveTo(706, 440);
+        ctx.quadraticCurveTo(739, 455, 744, 480);
+        ctx.stroke();
+
+        // 7. 髮飾小亮點（左側粉嫩櫻花小髮夾）
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath(); ctx.arc(355, 305, 12, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath(); ctx.arc(355, 305, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+
+        // 11. 晶瑩剔透琥珀深邃動漫大眼 (Crystal Amber-Hazel Anime Eyes)
+        // 左右對稱雙眼，瞳孔水潤晶亮、黃金比例收斂，完全不超過臉蛋輪廓
+        drawChibiEye(ctx, 428, 385, 34, '#9a3412', '#f59e0b', state.nutrition, '#271713');
+        drawChibiEye(ctx, 596, 385, 34, '#9a3412', '#f59e0b', state.nutrition, '#271713');
+
+        // 12. 粉嫩愛心光點腮紅 (Soft Rosy Cheeks)
+        drawBlush(ctx, 385, 436, 28, 'rgba(251, 113, 133, 0.45)');
+        drawBlush(ctx, 639, 436, 28, 'rgba(251, 113, 133, 0.45)');
+
+        // 13. 甜美精緻萌嘴 (Sweet Lovely Smile)
+        drawMouth(ctx, 512, 455, state.nutrition);
       }
-      ctx.fill();
-
-      // 眼睛與笑臉裝飾
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(210, 210, 16, 0, Math.PI * 2);
-      ctx.arc(302, 210, 16, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.arc(256, 240, 30, 0.2, Math.PI - 0.2);
-      ctx.stroke();
 
       return cvs;
+    }
+
+    // 輔助函式：繪製黑白靈動動漫大眼
+    function drawChibiEye(ctx, cx, cy, radius, primaryColor, highlightColor, nutrition, baseColor = '#18181b') {
+      ctx.save();
+      // 1. 純白眼白 (柔和微弧)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, radius, radius * 1.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 剪裁在眼白內，確保眼珠絕不超出眼眶
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, radius, radius * 1.2, 0, 0, Math.PI * 2);
+      ctx.clip();
+
+      // 2. 純黑眼珠
+      ctx.fillStyle = '#18181b';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 2, radius * 0.82, radius * 1.05, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. 瞳孔 (極致深邃純黑)
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(cx, cy + 4, radius * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. 飲食狀態眼神特效
+      if (nutrition === 'caffeine') {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - 10, cy + 4); ctx.lineTo(cx + 10, cy + 4);
+        ctx.moveTo(cx, cy - 6); ctx.lineTo(cx, cy + 14);
+        ctx.stroke();
+      } else if (nutrition === 'sugarSpike') {
+        ctx.fillStyle = '#ffffff';
+        drawStar(ctx, cx, cy + 4, 5, 10, 4);
+        ctx.fill();
+      }
+
+      // 5. 雙重白光高光亮點 (Sparkling White Highlights)
+      ctx.fillStyle = '#ffffff';
+      // 主高光 (左上方大圓)
+      ctx.beginPath();
+      ctx.arc(cx - radius * 0.30, cy - radius * 0.32, radius * 0.32, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 次高光 (右下方小圓)
+      ctx.beginPath();
+      ctx.arc(cx + radius * 0.26, cy + radius * 0.30, radius * 0.16, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 底部微小反光點
+      ctx.beginPath();
+      ctx.arc(cx - radius * 0.08, cy + radius * 0.52, radius * 0.09, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // 6. 精緻上眼線與長睫毛 (純黑)
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(cx, cy - 6, radius * 0.95, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+
+      // 俏麗眼尾上揚睫毛
+      const isRightEye = cx > 512;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx + (isRightEye ? radius * 0.75 : -radius * 0.75), cy - 12);
+      ctx.lineTo(cx + (isRightEye ? radius * 1.1 : -radius * 1.1), cy - 20);
+      ctx.stroke();
+
+      // 柔和雙眼皮線
+      ctx.strokeStyle = 'rgba(180, 100, 50, 0.45)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy - 18, radius * 0.8, Math.PI * 1.25, Math.PI * 1.75);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // 輔助函式：腮紅
+    function drawBlush(ctx, cx, cy, r, color) {
+      ctx.save();
+      const blushGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, r);
+      blushGrad.addColorStop(0, color);
+      blushGrad.addColorStop(1, 'rgba(251, 113, 133, 0)');
+      ctx.fillStyle = blushGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 腮紅上的可愛微光點
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+      ctx.beginPath();
+      ctx.arc(cx - 5, cy - 4, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 輔助函式：精緻嘴巴
+    function drawMouth(ctx, cx, cy, nutrition) {
+      ctx.save();
+      if (nutrition === 'caffeine' || nutrition === 'sugarSpike') {
+        // 興奮大張口 (可愛弧形)
+        ctx.fillStyle = '#f43f5e';
+        ctx.strokeStyle = '#9f1239';
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy - 2, 20, 0.15, Math.PI - 0.15);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 上排白色小牙
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(cx - 10, cy - 2, 20, 6, 2);
+        else ctx.rect(cx - 10, cy - 2, 20, 6);
+        ctx.fill();
+
+        // 粉嫩小舌頭
+        ctx.fillStyle = '#fda4af';
+        ctx.beginPath();
+        ctx.arc(cx, cy + 9, 10, 0, Math.PI);
+        ctx.fill();
+      } else if (nutrition === 'refinedSugar') {
+        // 疲倦呆萌小嘴
+        ctx.strokeStyle = '#e11d48';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx - 14, cy + 2);
+        ctx.quadraticCurveTo(cx, cy - 2, cx + 14, cy + 2);
+        ctx.stroke();
+      } else {
+        // 甜美微張微笑 (Gentle Sweet Smile)
+        ctx.fillStyle = '#f43f5e';
+        ctx.strokeStyle = '#be123c';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy - 3, 16, 0.2, Math.PI - 0.2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 露出一點點可愛白齒
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(cx - 8, cy - 3, 16, 4, 1);
+        else ctx.rect(cx - 8, cy - 3, 16, 4);
+        ctx.fill();
+
+        // 粉紅舌尖
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath();
+        ctx.arc(cx, cy + 6, 8, 0, Math.PI);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // 輔助函式：星形
+    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      const step = Math.PI / spikes;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.lineTo(cx, cy - outerRadius);
+      ctx.closePath();
     }
 
     /* ==========================================
-       四、Three.js 2.5D 場景（定角，不可移動旋轉）
+       四、Three.js 3D/2.5D 場景與 3D Q 版小女孩 Procedural 建模
        ========================================== */
     let scene, camera, renderer, characterGroup;
-    let charMesh, heartMesh, gutMesh, shadowMesh;
+    let charMesh, heartMesh, gutMesh, shadowMesh, girl3DMesh;
+    let heartHitProxy, gutHitProxy;
     let raycaster, mouse;
 
+    // 輔助函式：產生 3D 動漫大眼紋理 (純黑白極簡靈動大眼)
+    function create3DEyeTexture(isRightEye) {
+      const cvs = document.createElement('canvas');
+      cvs.width = 512; cvs.height = 512;
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, 512, 512);
+
+      const cx = 256, cy = 256;
+
+      // 1. 純白眼白 (柔和水潤蛋形，保持在眼框內部不溢出)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 155, 185, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. 剪裁在眼白範圍內的純黑眼珠與高光 (保證絕不超出眼眶)
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 155, 185, 0, 0, Math.PI * 2);
+      ctx.clip();
+
+      // 純黑深邃眼珠
+      ctx.fillStyle = '#18181b';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 6, 120, 155, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 瞳孔中心極致純黑
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 8, 75, 95, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. 純白晶亮雙重高光
+      ctx.fillStyle = '#ffffff';
+      // 主高光 (左上方大亮點)
+      ctx.beginPath();
+      ctx.arc(cx - 42, cy - 45, 38, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 次高光 (右下方小亮點)
+      ctx.beginPath();
+      ctx.arc(cx + 36, cy + 42, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 底部微光亮點
+      ctx.beginPath();
+      ctx.arc(cx - 10, cy + 78, 11, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // 4. 精緻純黑上眼線與俏麗眼睫毛
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 22;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(cx, cy + 10, 150, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+
+      // 翹睫毛 (純黑自然貼合上眼線)
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.moveTo(cx + (isRightEye ? 110 : -110), cy - 18);
+      ctx.lineTo(cx + (isRightEye ? 150 : -150), cy - 45);
+      ctx.stroke();
+
+      // 雙眼皮細線 (深灰黑微線)
+      ctx.strokeStyle = 'rgba(24, 24, 27, 0.4)';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(cx, cy - 35, 130, Math.PI * 1.25, Math.PI * 1.75);
+      ctx.stroke();
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    // 輔助函式：產生 PUMA 粉色短袖 T 恤印花紋理
+    function createPumaShirtTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 512; cvs.height = 512;
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, 512, 512);
+
+      // 粉色布料底色
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, 512);
+      bgGrad.addColorStop(0, '#f9a8d4');
+      bgGrad.addColorStop(0.5, '#f472b6');
+      bgGrad.addColorStop(1, '#ec4899');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // 胸前白色 PUMA 經典文字與美洲獅躍動剪影
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '900 68px "Arial Black", "Impact", sans-serif';
+      ctx.letterSpacing = '4px';
+      ctx.fillText('PUMA', 256, 260);
+
+      // 美洲獅跳躍剪影 (Jumping Puma Silhouette)
+      ctx.beginPath();
+      ctx.moveTo(330, 200);
+      ctx.bezierCurveTo(345, 185, 365, 175, 390, 180);
+      ctx.bezierCurveTo(405, 185, 415, 195, 420, 205);
+      ctx.bezierCurveTo(410, 205, 395, 200, 385, 202);
+      ctx.bezierCurveTo(370, 205, 360, 215, 350, 225);
+      ctx.bezierCurveTo(340, 235, 330, 245, 315, 248);
+      ctx.bezierCurveTo(325, 235, 325, 215, 330, 200);
+      ctx.closePath();
+      ctx.fill();
+
+      // 前爪與尾巴
+      ctx.beginPath();
+      ctx.moveTo(390, 180);
+      ctx.quadraticCurveTo(410, 160, 425, 150);
+      ctx.lineTo(418, 165);
+      ctx.quadraticCurveTo(405, 175, 395, 185);
+      ctx.closePath();
+      ctx.fill();
+
+      // 後腿伸展
+      ctx.beginPath();
+      ctx.moveTo(315, 248);
+      ctx.quadraticCurveTo(295, 260, 275, 265);
+      ctx.lineTo(285, 252);
+      ctx.quadraticCurveTo(305, 248, 320, 238);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    // 輔助函式：產生 3D 萌妹微笑嘴巴紋理
+    function create3DMouthTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 256; cvs.height = 256;
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, 256, 256);
+
+      const cx = 128, cy = 120;
+      // 1. 微笑大弧度輪廓 (甜美張嘴)
+      ctx.fillStyle = '#9f1239';
+      ctx.strokeStyle = '#881337';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(cx - 55, cy);
+      ctx.bezierCurveTo(cx - 35, cy + 85, cx + 35, cy + 85, cx + 55, cy);
+      ctx.quadraticCurveTo(cx, cy - 8, cx - 55, cy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // 2. 上排白色小貝齒
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(cx - 45, cy);
+      ctx.quadraticCurveTo(cx, cy - 4, cx + 45, cy);
+      ctx.lineTo(cx + 40, cy + 24);
+      ctx.quadraticCurveTo(cx, cy + 18, cx - 40, cy + 24);
+      ctx.closePath();
+      ctx.fill();
+
+      // 3. 粉嫩小舌頭
+      ctx.fillStyle = '#fda4af';
+      ctx.beginPath();
+      ctx.arc(cx, cy + 48, 30, 0, Math.PI);
+      ctx.fill();
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    // 輔助函式：產生 3D 腮紅紋理
+    function create3DBlushTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 256; cvs.height = 256;
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, 256, 256);
+
+      const grad = ctx.createRadialGradient(128, 128, 10, 128, 128, 110);
+      grad.addColorStop(0, 'rgba(251, 113, 133, 0.85)');
+      grad.addColorStop(0.4, 'rgba(251, 113, 133, 0.45)');
+      grad.addColorStop(0.8, 'rgba(251, 113, 133, 0.1)');
+      grad.addColorStop(1, 'rgba(251, 113, 133, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 256, 256);
+
+      // 可愛微光小白點
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.beginPath(); ctx.arc(105, 105, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(145, 135, 6, 0, Math.PI * 2); ctx.fill();
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    // 輔助函式：產生櫻花髮夾紋理
+    function createSakuraTexture() {
+      const cvs = document.createElement('canvas');
+      cvs.width = 256; cvs.height = 256;
+      const ctx = cvs.getContext('2d');
+      ctx.clearRect(0, 0, 256, 256);
+
+      ctx.save();
+      ctx.translate(128, 128);
+      // 5 瓣櫻花
+      ctx.fillStyle = '#f472b6';
+      for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-35, -50, -30, -95, 0, -85);
+        ctx.bezierCurveTo(30, -95, 35, -50, 0, 0);
+        ctx.fill();
+        ctx.rotate((Math.PI * 2) / 5);
+      }
+      // 花蕊金色小圓
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(0, 0, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.needsUpdate = true;
+      return tex;
+    }
+
+    // 輔助函式：建立真正的 3D Q 版小女孩立體 Mesh 模型 (極致精緻動漫細節與流暢物理動態)
+    function build3DChibiGirlModel() {
+      const root = new THREE.Group();
+      root.name = 'girl3D';
+
+      // --- 材質定義 ---
+      const skinMat = new THREE.MeshStandardMaterial({
+        color: 0xfff0ea,
+        roughness: 0.38,
+        metalness: 0.02
+      });
+      // 絲滑深曜黑/黑巧棕長髮
+      const hairMat = new THREE.MeshStandardMaterial({
+        color: 0x1c1618,
+        roughness: 0.32,
+        metalness: 0.22
+      });
+      const hairHiMat = new THREE.MeshStandardMaterial({
+        color: 0x2e2327,
+        roughness: 0.28,
+        metalness: 0.25
+      });
+      const clothPinkMat = new THREE.MeshStandardMaterial({
+        map: createPumaShirtTexture(),
+        roughness: 0.52
+      });
+      const clothWhiteMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.35
+      });
+      // 甜美粉藍短褲材質
+      const shortsBlueMat = new THREE.MeshStandardMaterial({
+        color: 0x7dd3fc,
+        roughness: 0.48
+      });
+      const sockMat = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        roughness: 0.42
+      });
+      // 粉紅漆皮娃娃鞋材質 (Glossy Pink Mary Jane Shoes)
+      const shoePinkMat = new THREE.MeshStandardMaterial({
+        color: 0xf472b6,
+        roughness: 0.22,
+        metalness: 0.25
+      });
+      const shoeDarkSoleMat = new THREE.MeshStandardMaterial({
+        color: 0x831843,
+        roughness: 0.65
+      });
+      const goldBuckleMat = new THREE.MeshStandardMaterial({
+        color: 0xfde047,
+        metalness: 0.85,
+        roughness: 0.20
+      });
+
+      // 1. 頭部群組 (Head Group)
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, 0.45, 0);
+      root.add(headGroup);
+
+      // 頭部底座球體 (Q 版萌感微胖臉頰)
+      const headGeo = new THREE.SphereGeometry(0.56, 32, 28);
+      headGeo.scale(1.06, 1.0, 0.98);
+      const headMesh = new THREE.Mesh(headGeo, skinMat);
+      headGroup.add(headMesh);
+
+      // 雙耳 (Cute Chibi Ears with blush)
+      const earGeo = new THREE.SphereGeometry(0.12, 16, 16);
+      earGeo.scale(0.45, 0.85, 0.65);
+      const leftEar = new THREE.Mesh(earGeo, skinMat);
+      leftEar.position.set(-0.54, -0.02, 0.04);
+      leftEar.rotation.z = -0.15;
+      leftEar.rotation.y = 0.25;
+      headGroup.add(leftEar);
+
+      const rightEar = new THREE.Mesh(earGeo, skinMat);
+      rightEar.position.set(0.54, -0.02, 0.04);
+      rightEar.rotation.z = 0.15;
+      rightEar.rotation.y = -0.25;
+      headGroup.add(rightEar);
+
+      // 雙眼 (3D 弧面貼合眼片，支援即時眨眼動畫，精準契合臉龐不超過輪廓)
+      const eyeGeo = new THREE.PlaneGeometry(0.23, 0.26);
+      
+      const leftEyeMat = new THREE.MeshBasicMaterial({
+        map: create3DEyeTexture(false),
+        transparent: true,
+        depthWrite: false
+      });
+      const leftEye = new THREE.Mesh(eyeGeo, leftEyeMat);
+      leftEye.position.set(-0.17, 0.03, 0.53);
+      leftEye.rotation.y = -0.16;
+      leftEye.rotation.x = -0.04;
+      headGroup.add(leftEye);
+
+      const rightEyeMat = new THREE.MeshBasicMaterial({
+        map: create3DEyeTexture(true),
+        transparent: true,
+        depthWrite: false
+      });
+      const rightEye = new THREE.Mesh(eyeGeo, rightEyeMat);
+      rightEye.position.set(0.17, 0.03, 0.53);
+      rightEye.rotation.y = 0.16;
+      rightEye.rotation.x = -0.04;
+      headGroup.add(rightEye);
+
+      // 腮紅 (左右粉嫩光斑)
+      const blushGeo = new THREE.PlaneGeometry(0.18, 0.18);
+      const blushMat = new THREE.MeshBasicMaterial({
+        map: create3DBlushTexture(),
+        transparent: true,
+        depthWrite: false
+      });
+      const leftBlush = new THREE.Mesh(blushGeo, blushMat);
+      leftBlush.position.set(-0.25, -0.10, 0.50);
+      leftBlush.rotation.y = -0.28;
+      headGroup.add(leftBlush);
+
+      const rightBlush = new THREE.Mesh(blushGeo, blushMat);
+      rightBlush.position.set(0.25, -0.10, 0.50);
+      rightBlush.rotation.y = 0.28;
+      headGroup.add(rightBlush);
+
+      // 甜美微笑大口 (貼片紋理 + 3D 立體唇線)
+      const mouthPlaneGeo = new THREE.PlaneGeometry(0.22, 0.16);
+      const mouthMat = new THREE.MeshBasicMaterial({
+        map: create3DMouthTexture(),
+        transparent: true,
+        depthWrite: false
+      });
+      const mouthPlane = new THREE.Mesh(mouthPlaneGeo, mouthMat);
+      mouthPlane.position.set(0, -0.18, 0.54);
+      headGroup.add(mouthPlane);
+
+      // 微凸可愛小鼻子
+      const noseGeo = new THREE.SphereGeometry(0.02, 12, 12);
+      const noseMesh = new THREE.Mesh(noseGeo, skinMat);
+      noseMesh.position.set(0, -0.05, 0.56);
+      headGroup.add(noseMesh);
+
+      // --- 3D 長黑髮系統 (俐落甜美雙馬尾 + 整齊齊瀏海) ---
+      // 1. 後腦勺髮罩 (包覆後頭部)
+      const hairBackGeo = new THREE.SphereGeometry(0.62, 32, 24);
+      hairBackGeo.scale(1.08, 1.12, 1.10);
+      const hairBackMesh = new THREE.Mesh(hairBackGeo, hairMat);
+      hairBackMesh.position.set(0, 0.05, -0.08);
+      headGroup.add(hairBackMesh);
+
+      // 2. 3D 甜美雙馬尾髮束 (Twin Tails - 左右兩側柔順垂落長雙馬尾與粉色髮圈)
+      const hairTieMat = new THREE.MeshStandardMaterial({
+        color: 0xf472b6,
+        roughness: 0.35,
+        metalness: 0.2
+      });
+
+      // 左雙馬尾髮圈與髮束
+      const leftTieGeo = new THREE.TorusGeometry(0.10, 0.03, 12, 20);
+      const leftTie = new THREE.Mesh(leftTieGeo, hairTieMat);
+      leftTie.position.set(-0.52, 0.20, 0.02);
+      leftTie.rotation.y = Math.PI / 2;
+      leftTie.rotation.z = -0.3;
+      headGroup.add(leftTie);
+
+      const leftPigtailCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-0.52, 0.20, 0.02),
+        new THREE.Vector3(-0.66, -0.02, 0.08),
+        new THREE.Vector3(-0.60, -0.35, 0.06),
+        new THREE.Vector3(-0.48, -0.72, 0.02)
+      ]);
+      const leftPigtailGeo = new THREE.TubeGeometry(leftPigtailCurve, 32, 0.11, 12, false);
+      const leftPigtailMesh = new THREE.Mesh(leftPigtailGeo, hairMat);
+      headGroup.add(leftPigtailMesh);
+
+      // 右雙馬尾髮圈與髮束
+      const rightTie = new THREE.Mesh(leftTieGeo, hairTieMat);
+      rightTie.position.set(0.52, 0.20, 0.02);
+      rightTie.rotation.y = -Math.PI / 2;
+      rightTie.rotation.z = 0.3;
+      headGroup.add(rightTie);
+
+      const rightPigtailCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0.52, 0.20, 0.02),
+        new THREE.Vector3(0.66, -0.02, 0.08),
+        new THREE.Vector3(0.60, -0.35, 0.06),
+        new THREE.Vector3(0.48, -0.72, 0.02)
+      ]);
+      const rightPigtailGeo = new THREE.TubeGeometry(rightPigtailCurve, 32, 0.11, 12, false);
+      const rightPigtailMesh = new THREE.Mesh(rightPigtailGeo, hairMat);
+      headGroup.add(rightPigtailMesh);
+
+      // 4. 前額整齊齊瀏海 (5 片厚實空氣齊瀏海)
+      const bangsConfig = [
+        { x: -0.32, y: 0.20, z: 0.44, rotZ: 0.18, rotX: -0.38, sx: 0.16, sy: 0.30, sz: 0.10 },
+        { x: -0.16, y: 0.23, z: 0.50, rotZ: 0.08, rotX: -0.40, sx: 0.17, sy: 0.32, sz: 0.10 },
+        { x: 0,     y: 0.25, z: 0.52, rotZ: 0.00, rotX: -0.42, sx: 0.18, sy: 0.34, sz: 0.10 },
+        { x: 0.16,  y: 0.23, z: 0.50, rotZ: -0.08, rotX: -0.40, sx: 0.17, sy: 0.32, sz: 0.10 },
+        { x: 0.32,  y: 0.20, z: 0.44, rotZ: -0.18, rotX: -0.38, sx: 0.16, sy: 0.30, sz: 0.10 }
+      ];
+      bangsConfig.forEach(bg => {
+        const bgGeo = new THREE.SphereGeometry(0.5, 16, 12);
+        bgGeo.scale(bg.sx, bg.sy, bg.sz);
+        const bgMesh = new THREE.Mesh(bgGeo, hairMat);
+        bgMesh.position.set(bg.x, bg.y, bg.z);
+        bgMesh.rotation.set(bg.rotX, 0, bg.rotZ);
+        headGroup.add(bgMesh);
+      });
+
+      // 5. 櫻花造型髮夾 (Sakura Hairpin)
+      const sakuraGeo = new THREE.PlaneGeometry(0.18, 0.18);
+      const sakuraMat = new THREE.MeshBasicMaterial({
+        map: createSakuraTexture(),
+        transparent: true,
+        depthWrite: false
+      });
+      const sakuraMesh = new THREE.Mesh(sakuraGeo, sakuraMat);
+      sakuraMesh.position.set(-0.36, 0.28, 0.42);
+      sakuraMesh.rotation.y = -0.35;
+      sakuraMesh.rotation.z = 0.25;
+      headGroup.add(sakuraMesh);
+
+      // 6. 3D Q 彈呆毛 (Ahoge Tube)
+      const ahogeCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0.52, 0.05),
+        new THREE.Vector3(0.06, 0.68, 0.10),
+        new THREE.Vector3(0.14, 0.78, 0.02),
+        new THREE.Vector3(0.10, 0.88, -0.06)
+      ]);
+      const ahogeGeo = new THREE.TubeGeometry(ahogeCurve, 20, 0.028, 8, false);
+      const ahogeMesh = new THREE.Mesh(ahogeGeo, hairMat);
+      headGroup.add(ahogeMesh);
+
+      // 7. 頭頂光澤高光弧光 (Glossy Hair Halo Sheen)
+      const haloGeo = new THREE.TorusGeometry(0.57, 0.02, 8, 32, Math.PI * 0.75);
+      const haloMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.2,
+        metalness: 0.4,
+        transparent: true,
+        opacity: 0.55
+      });
+      const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+      haloMesh.position.set(0, 0.30, 0.22);
+      haloMesh.rotation.x = -0.65;
+      haloMesh.rotation.z = Math.PI * 0.12;
+      headGroup.add(haloMesh);
+
+      // 2. 頸部 (Neck)
+      const neckGeo = new THREE.CylinderGeometry(0.12, 0.15, 0.18, 20);
+      const neckMesh = new THREE.Mesh(neckGeo, skinMat);
+      neckMesh.position.set(0, 0.02, 0);
+      root.add(neckMesh);
+
+      // 3. 軀幹與服裝群組 (Torso & Outfit)
+      const torsoGroup = new THREE.Group();
+      torsoGroup.position.set(0, -0.32, 0);
+      root.add(torsoGroup);
+
+      // 粉色 PUMA 印花 T 恤本體
+      const shirtGeo = new THREE.CylinderGeometry(0.30, 0.33, 0.48, 24);
+      const shirtMesh = new THREE.Mesh(shirtGeo, clothPinkMat);
+      torsoGroup.add(shirtMesh);
+
+      // 白色圓領 (Collar Ring)
+      const collarGeo = new THREE.TorusGeometry(0.17, 0.03, 16, 24);
+      const collarMesh = new THREE.Mesh(collarGeo, clothWhiteMat);
+      collarMesh.position.set(0, 0.23, 0.02);
+      collarMesh.rotation.x = Math.PI / 2;
+      torsoGroup.add(collarMesh);
+
+      // 甜美粉藍荷葉邊波浪短褲 (Baby Blue Scalloped Shorts)
+      const shortsGeo = new THREE.CylinderGeometry(0.33, 0.44, 0.28, 24);
+      const shortsMesh = new THREE.Mesh(shortsGeo, shortsBlueMat);
+      shortsMesh.position.set(0, -0.32, 0);
+      torsoGroup.add(shortsMesh);
+
+      // 褲管下緣白色波浪波紋花邊 (White Scallop Lace Trim Rings)
+      const leftShortsLaceGeo = new THREE.TorusGeometry(0.23, 0.022, 12, 24);
+      const leftShortsLace = new THREE.Mesh(leftShortsLaceGeo, clothWhiteMat);
+      leftShortsLace.position.set(-0.12, -0.45, 0);
+      leftShortsLace.rotation.x = Math.PI / 2;
+      torsoGroup.add(leftShortsLace);
+
+      const rightShortsLaceGeo = new THREE.TorusGeometry(0.23, 0.022, 12, 24);
+      const rightShortsLace = new THREE.Mesh(rightShortsLaceGeo, clothWhiteMat);
+      rightShortsLace.position.set(0.12, -0.45, 0);
+      rightShortsLace.rotation.x = Math.PI / 2;
+      torsoGroup.add(rightShortsLace);
+
+      // 4. 手臂群組 (Chibi Arms - 自然垂直下垂於身側)
+      // 左手臂
+      const leftArmGroup = new THREE.Group();
+      leftArmGroup.position.set(-0.30, -0.16, 0);
+      root.add(leftArmGroup);
+
+      const leftSleeveGeo = new THREE.SphereGeometry(0.11, 16, 12);
+      const leftSleeve = new THREE.Mesh(leftSleeveGeo, new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.55 }));
+      leftArmGroup.add(leftSleeve);
+
+      const armGeo = new THREE.CylinderGeometry(0.062, 0.052, 0.40, 16);
+      const leftArm = new THREE.Mesh(armGeo, skinMat);
+      leftArm.position.set(-0.02, -0.22, 0.02);
+      leftArm.rotation.z = 0.06;
+      leftArmGroup.add(leftArm);
+
+      const handGeo = new THREE.SphereGeometry(0.065, 16, 16);
+      const leftHand = new THREE.Mesh(handGeo, skinMat);
+      leftHand.position.set(-0.03, -0.42, 0.02);
+      leftArmGroup.add(leftHand);
+
+      // 右手臂
+      const rightArmGroup = new THREE.Group();
+      rightArmGroup.position.set(0.30, -0.16, 0);
+      root.add(rightArmGroup);
+
+      const rightSleeve = new THREE.Mesh(leftSleeveGeo, new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.55 }));
+      rightArmGroup.add(rightSleeve);
+
+      const rightArm = new THREE.Mesh(armGeo, skinMat);
+      rightArm.position.set(0.02, -0.22, 0.02);
+      rightArm.rotation.z = -0.06;
+      rightArmGroup.add(rightArm);
+
+      const rightHand = new THREE.Mesh(handGeo, skinMat);
+      rightHand.position.set(0.03, -0.42, 0.02);
+      rightArmGroup.add(rightHand);
+
+      // 5. 雙腿與球鞋 (Legs, White Crew Socks & Pastel Blue Sneakers)
+      const legGeo = new THREE.CylinderGeometry(0.085, 0.075, 0.55, 16);
+
+      // 左腿
+      const leftLeg = new THREE.Mesh(legGeo, skinMat);
+      leftLeg.position.set(-0.14, -0.92, 0);
+      root.add(leftLeg);
+
+      // 右腿
+      const rightLeg = new THREE.Mesh(legGeo, skinMat);
+      rightLeg.position.set(0.14, -0.92, 0);
+      root.add(rightLeg);
+
+      // 膝蓋微紅粉嫩高光
+      const kneeGeo = new THREE.SphereGeometry(0.045, 12, 12);
+      const kneeMat = new THREE.MeshBasicMaterial({ color: 0xfca5a5, transparent: true, opacity: 0.45 });
+      const leftKnee = new THREE.Mesh(kneeGeo, kneeMat);
+      leftKnee.position.set(-0.14, -0.86, 0.07);
+      root.add(leftKnee);
+      const rightKnee = new THREE.Mesh(kneeGeo, kneeMat);
+      rightKnee.position.set(0.14, -0.86, 0.07);
+      root.add(rightKnee);
+
+      // 白色中筒襪 (White Crew Socks)
+      const sockGeo = new THREE.CylinderGeometry(0.086, 0.082, 0.26, 16);
+      const leftSock = new THREE.Mesh(sockGeo, sockMat);
+      leftSock.position.set(-0.14, -1.14, 0);
+      root.add(leftSock);
+      const rightSock = new THREE.Mesh(sockGeo, sockMat);
+      rightSock.position.set(0.14, -1.14, 0);
+      root.add(rightSock);
+
+      // 襪口荷葉蕾絲邊飾 (White Lace Scallop Ankle Ruffles)
+      const sockRuffleGeo = new THREE.TorusGeometry(0.090, 0.018, 12, 24);
+      const leftRuffle = new THREE.Mesh(sockRuffleGeo, clothWhiteMat);
+      leftRuffle.position.set(-0.14, -1.02, 0);
+      leftRuffle.rotation.x = Math.PI / 2;
+      root.add(leftRuffle);
+      const rightRuffle = new THREE.Mesh(sockRuffleGeo, clothWhiteMat);
+      rightRuffle.position.set(0.14, -1.02, 0);
+      rightRuffle.rotation.x = Math.PI / 2;
+      root.add(rightRuffle);
+
+      // 粉紅漆皮娃娃鞋 (Glossy Pink Mary Jane Doll Shoes with Bows & Buckles)
+      const dollShoeGeo = new THREE.BoxGeometry(0.16, 0.11, 0.25);
+      const dollToeGeo = new THREE.SphereGeometry(0.082, 18, 16);
+      dollToeGeo.scale(0.98, 0.68, 1.15);
+      const dollSoleGeo = new THREE.BoxGeometry(0.166, 0.026, 0.275);
+      const strapGeo = new THREE.BoxGeometry(0.165, 0.024, 0.035);
+      const buckleGeo = new THREE.SphereGeometry(0.022, 12, 12);
+      const bowWingGeo = new THREE.SphereGeometry(0.028, 12, 12);
+      bowWingGeo.scale(1.4, 0.65, 0.85);
+      const bowKnotGeo = new THREE.SphereGeometry(0.016, 10, 10);
+
+      // --- 左娃娃鞋 ---
+      const leftDollShoe = new THREE.Group();
+      leftDollShoe.position.set(-0.14, -1.33, 0.04);
+      root.add(leftDollShoe);
+
+      // 鞋身
+      const leftShoeBody = new THREE.Mesh(dollShoeGeo, shoePinkMat);
+      leftShoeBody.position.set(0, 0.02, -0.01);
+      leftDollShoe.add(leftShoeBody);
+
+      // 圓潤鞋頭
+      const leftToe = new THREE.Mesh(dollToeGeo, shoePinkMat);
+      leftToe.position.set(0, 0.005, 0.092);
+      leftDollShoe.add(leftToe);
+
+      // 薄底
+      const leftDollSole = new THREE.Mesh(dollSoleGeo, shoeDarkSoleMat);
+      leftDollSole.position.set(0, -0.045, 0.01);
+      leftDollShoe.add(leftDollSole);
+
+      // 瑪莉珍一字帶
+      const leftStrap = new THREE.Mesh(strapGeo, shoePinkMat);
+      leftStrap.position.set(0, 0.065, -0.02);
+      leftDollShoe.add(leftStrap);
+
+      // 金屬釦飾
+      const leftBuckle = new THREE.Mesh(buckleGeo, goldBuckleMat);
+      leftBuckle.position.set(-0.082, 0.065, -0.02);
+      leftDollShoe.add(leftBuckle);
+
+      // 鞋頭可愛蝴蝶結
+      const leftBowGroup = new THREE.Group();
+      leftBowGroup.position.set(0, 0.058, 0.09);
+      const leftBowL = new THREE.Mesh(bowWingGeo, shoePinkMat);
+      leftBowL.position.set(-0.025, 0, 0);
+      leftBowL.rotation.z = 0.25;
+      leftBowGroup.add(leftBowL);
+      const leftBowR = new THREE.Mesh(bowWingGeo, shoePinkMat);
+      leftBowR.position.set(0.025, 0, 0);
+      leftBowR.rotation.z = -0.25;
+      leftBowGroup.add(leftBowR);
+      const leftBowPearl = new THREE.Mesh(bowKnotGeo, goldBuckleMat);
+      leftBowGroup.add(leftBowPearl);
+      leftDollShoe.add(leftBowGroup);
+
+      // --- 右娃娃鞋 ---
+      const rightDollShoe = new THREE.Group();
+      rightDollShoe.position.set(0.14, -1.33, 0.04);
+      root.add(rightDollShoe);
+
+      // 鞋身
+      const rightShoeBody = new THREE.Mesh(dollShoeGeo, shoePinkMat);
+      rightShoeBody.position.set(0, 0.02, -0.01);
+      rightDollShoe.add(rightShoeBody);
+
+      // 圓潤鞋頭
+      const rightToe = new THREE.Mesh(dollToeGeo, shoePinkMat);
+      rightToe.position.set(0, 0.005, 0.092);
+      rightDollShoe.add(rightToe);
+
+      // 薄底
+      const rightDollSole = new THREE.Mesh(dollSoleGeo, shoeDarkSoleMat);
+      rightDollSole.position.set(0, -0.045, 0.01);
+      rightDollShoe.add(rightDollSole);
+
+      // 瑪莉珍一字帶
+      const rightStrap = new THREE.Mesh(strapGeo, shoePinkMat);
+      rightStrap.position.set(0, 0.065, -0.02);
+      rightDollShoe.add(rightStrap);
+
+      // 金屬釦飾
+      const rightBuckle = new THREE.Mesh(buckleGeo, goldBuckleMat);
+      rightBuckle.position.set(0.082, 0.065, -0.02);
+      rightDollShoe.add(rightBuckle);
+
+      // 鞋頭可愛蝴蝶結
+      const rightBowGroup = new THREE.Group();
+      rightBowGroup.position.set(0, 0.058, 0.09);
+      const rightBowL = new THREE.Mesh(bowWingGeo, shoePinkMat);
+      rightBowL.position.set(-0.025, 0, 0);
+      rightBowL.rotation.z = 0.25;
+      rightBowGroup.add(rightBowL);
+      const rightBowR = new THREE.Mesh(bowWingGeo, shoePinkMat);
+      rightBowR.position.set(0.025, 0, 0);
+      rightBowR.rotation.z = -0.25;
+      rightBowGroup.add(rightBowR);
+      const rightBowPearl = new THREE.Mesh(bowKnotGeo, goldBuckleMat);
+      rightBowGroup.add(rightBowPearl);
+      rightDollShoe.add(rightBowGroup);
+
+      // 儲存動態節點供即時眨眼與物理動畫使用
+      root.userData.headGroup = headGroup;
+      root.userData.torsoGroup = torsoGroup;
+      root.userData.leftArmGroup = leftArmGroup;
+      root.userData.rightArmGroup = rightArmGroup;
+      root.userData.leftEye = leftEye;
+      root.userData.rightEye = rightEye;
+      root.userData.ahoge = ahogeMesh;
+
+      return root;
+    }
+
+    function createSvgCharacterCanvas(svgStr, targetWidth = 1800, targetHeight = 2400) {
+      return new Promise((resolve) => {
+        const svgContent = svgStr || DEFAULT_GIRL_SVG;
+        const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+        const url = (window.URL || window.webkitURL || window).createObjectURL(blob);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        img.onload = () => {
+          const cvs = document.createElement('canvas');
+          cvs.width = targetWidth;
+          cvs.height = targetHeight;
+          const ctx = cvs.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          (window.URL || window.webkitURL || window).revokeObjectURL(url);
+          resolve(cvs);
+        };
+
+        img.onerror = (err) => {
+          console.warn('SVG texture render warning:', err);
+          (window.URL || window.webkitURL || window).revokeObjectURL(url);
+          const cvs = document.createElement('canvas');
+          cvs.width = 600; cvs.height = 800;
+          resolve(cvs);
+        };
+
+        img.src = url;
+      });
+    }
+
+    function exportPNG() {
+      const blob = new Blob([DEFAULT_GIRL_SVG], {
+        type: "image/svg+xml;charset=utf-8",
+      });
+      const URLObj = window.URL || window.webkitURL || window;
+      const blobURL = URLObj.createObjectURL(blob);
+
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1800;
+        canvas.height = 2400;
+
+        const ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(image, 0, 0, 1800, 2400);
+
+        const pngURL = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement("a");
+        downloadLink.href = pngURL;
+        downloadLink.download = "q-twintail-dollshoes.png";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        URLObj.revokeObjectURL(blobURL);
+      };
+
+      image.src = blobURL;
+    }
+
     function processImageToTexture(imgSrc, presetKey, callback) {
+      if (presetKey !== 'custom' || !imgSrc) {
+        createSvgCharacterCanvas(DEFAULT_GIRL_SVG, 1800, 2400).then((cvs) => {
+          const tex = new THREE.CanvasTexture(cvs);
+          tex.generateMipmaps = true;
+          tex.minFilter = THREE.LinearMipmapLinearFilter;
+          tex.needsUpdate = true;
+          callback(tex, 1800 / 2400);
+        });
+        return;
+      }
+
       const img = new Image();
       img.crossOrigin = "Anonymous";
 
@@ -969,6 +4339,8 @@
         cvs.width = img.width;
         cvs.height = img.height;
         const ctx = cvs.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0);
 
         try {
@@ -976,7 +4348,7 @@
           const data = imgData.data;
 
           for (let i = 0; i < data.length; i += 4) {
-            if (data[i] >= 240 && data[i+1] >= 240 && data[i+2] >= 240) {
+            if (data[i] >= 242 && data[i+1] >= 242 && data[i+2] >= 242) {
               data[i+3] = 0;
             }
           }
@@ -984,15 +4356,18 @@
         } catch (e) {}
 
         const tex = new THREE.CanvasTexture(cvs);
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
         tex.needsUpdate = true;
         callback(tex, img.width / img.height);
       };
 
       img.onerror = () => {
-        const cvs = createProceduralCharacterCanvas(presetKey);
-        const tex = new THREE.CanvasTexture(cvs);
-        tex.needsUpdate = true;
-        callback(tex, 0.5);
+        createSvgCharacterCanvas(DEFAULT_GIRL_SVG, 1800, 2400).then((cvs) => {
+          const tex = new THREE.CanvasTexture(cvs);
+          tex.needsUpdate = true;
+          callback(tex, 1800 / 2400);
+        });
       };
 
       img.src = imgSrc;
@@ -1000,12 +4375,36 @@
 
     function initThree() {
       const container = document.getElementById('right-display');
-      const width = container.clientWidth;
-      const height = container.clientHeight;
+      const width = container.clientWidth || (window.innerWidth > 1024 ? window.innerWidth * 0.58 : window.innerWidth);
+      const height = container.clientHeight || 700;
 
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-      camera.position.set(0, 0, 4.2);
+      camera.position.set(0, 0, 4.25);
+
+      // --- 3D 攝影棚動漫風格環境燈光設定 ---
+      const ambientLight = new THREE.AmbientLight(0xfff6ee, 0.82);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0xffffff, 0.90);
+      mainLight.position.set(2.8, 4.2, 3.6);
+      scene.add(mainLight);
+
+      const warmKeyLight = new THREE.DirectionalLight(0xffedd5, 0.40);
+      warmKeyLight.position.set(-2.5, 3.0, 2.5);
+      scene.add(warmKeyLight);
+
+      const fillLight = new THREE.DirectionalLight(0xfce7f3, 0.45);
+      fillLight.position.set(-3.0, -1.0, 2.0);
+      scene.add(fillLight);
+
+      const rimLight1 = new THREE.PointLight(0xa855f7, 0.65, 12);
+      rimLight1.position.set(2.5, 2.5, -3.2);
+      scene.add(rimLight1);
+
+      const rimLight2 = new THREE.PointLight(0x38bdf8, 0.55, 12);
+      rimLight2.position.set(-2.5, 2.5, -3.2);
+      scene.add(rimLight2);
 
       renderer = new THREE.WebGLRenderer({
         canvas: document.getElementById('three-canvas'),
@@ -1016,54 +4415,71 @@
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
       characterGroup = new THREE.Group();
-      characterGroup.scale.set(1.1, 1.1, 1.1);
+      characterGroup.scale.set(1.05, 1.05, 1.05);
       scene.add(characterGroup);
 
-      // 橢圓陰影
+      // 底部柔和陰影
       const shadowCvs = document.createElement('canvas');
       shadowCvs.width = 256; shadowCvs.height = 256;
       const sCtx = shadowCvs.getContext('2d');
-      const sGrad = sCtx.createRadialGradient(128,128,10, 128,128,120);
+      const sGrad = sCtx.createRadialGradient(128, 128, 10, 128, 128, 120);
       sGrad.addColorStop(0, 'rgba(15, 23, 42, 0.85)');
       sGrad.addColorStop(1, 'rgba(15, 23, 42, 0)');
       sCtx.fillStyle = sGrad;
-      sCtx.fillRect(0,0,256,256);
+      sCtx.fillRect(0, 0, 256, 256);
 
       const shadowTex = new THREE.CanvasTexture(shadowCvs);
-      const shadowGeo = new THREE.PlaneGeometry(1.6, 0.5);
+      const shadowGeo = new THREE.PlaneGeometry(1.9, 0.7);
       const shadowMat = new THREE.MeshBasicMaterial({
         map: shadowTex,
         transparent: true,
         depthWrite: false
       });
       shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
-      shadowMesh.position.set(0, -1.52, -0.05);
+      shadowMesh.position.set(0, -1.50, -0.05);
       shadowMesh.rotation.x = -Math.PI / 2.5;
       characterGroup.add(shadowMesh);
 
-      // 心臟 Mesh
-      const heartTex = new THREE.CanvasTexture(createHeartCanvas());
-      const heartGeo = new THREE.PlaneGeometry(1, 1);
-      const heartMat = new THREE.MeshBasicMaterial({
-        map: heartTex,
-        transparent: true,
-        depthWrite: false
-      });
-      heartMesh = new THREE.Mesh(heartGeo, heartMat);
+      // 心臟 Mesh (真實生物全紅解剖心臟 Realistic Biological Heart)
+      const heartTex = makeCanvasTexture(drawHeart, 1024, 1024);
+      heartMesh = buildOrgan(heartTex, 1.0, 1.0);
       heartMesh.userData = { type: 'heart' };
+      heartMesh.visible = false;
       characterGroup.add(heartMesh);
 
-      // 腸胃 Mesh
-      const gutTex = new THREE.CanvasTexture(createGutCanvas());
-      const gutGeo = new THREE.PlaneGeometry(1, 1);
-      const gutMat = new THREE.MeshBasicMaterial({
-        map: gutTex,
+      createSvgCharacterCanvas(REALISTIC_HEART_SVG, 1024, 1024).then((cvs) => {
+        const cvsTex = heartTex.image;
+        if (cvsTex && cvsTex.getContext) {
+          const ctx = cvsTex.getContext('2d');
+          ctx.clearRect(0, 0, 1024, 1024);
+          ctx.drawImage(cvs, 0, 0, 1024, 1024);
+          heartTex.needsUpdate = true;
+        }
+      });
+
+      // 腸胃 Mesh (CanvasTexture × PlaneGeometry 解剖器官)
+      const gutTex = makeCanvasTexture(drawDigestive, 768, 768);
+      gutMesh = buildOrgan(gutTex, 1.0, 1.0);
+      gutMesh.userData = { type: 'gut' };
+      gutMesh.visible = false;
+      characterGroup.add(gutMesh);
+
+      // 點擊觸發透明 Hit Proxies (胸口與腹部區域)
+      const hitMat = new THREE.MeshBasicMaterial({
         transparent: true,
+        opacity: 0,
         depthWrite: false
       });
-      gutMesh = new THREE.Mesh(gutGeo, gutMat);
-      gutMesh.userData = { type: 'gut' };
-      characterGroup.add(gutMesh);
+
+      const heartHitGeo = new THREE.PlaneGeometry(0.75, 0.75);
+      heartHitProxy = new THREE.Mesh(heartHitGeo, hitMat);
+      heartHitProxy.userData = { type: 'heart', isHitProxy: true };
+      characterGroup.add(heartHitProxy);
+
+      const gutHitGeo = new THREE.PlaneGeometry(0.9, 0.9);
+      gutHitProxy = new THREE.Mesh(gutHitGeo, hitMat.clone());
+      gutHitProxy.userData = { type: 'gut', isHitProxy: true };
+      characterGroup.add(gutHitProxy);
 
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
@@ -1072,14 +4488,168 @@
       setupMouseInteraction(container);
     }
 
+    function createCharacterEyeTexture(isRight) {
+      const cvs = document.createElement('canvas');
+      cvs.width = 256;
+      cvs.height = 256;
+      const ctx = cvs.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // 眼睛底色 (眼白)
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(128, 128, 92, 108, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.clip();
+
+      // 瞳孔深邃漸層
+      const grad = ctx.createLinearGradient(128, 30, 128, 230);
+      grad.addColorStop(0, '#18181b');
+      grad.addColorStop(0.7, '#0f172a');
+      grad.addColorStop(1, '#1e293b');
+      ctx.beginPath();
+      ctx.ellipse(128, 132, 70, 88, 0, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // 內圈深黑主瞳
+      ctx.beginPath();
+      ctx.arc(128, 132, 42, 0, Math.PI * 2);
+      ctx.fillStyle = '#000000';
+      ctx.fill();
+
+      // 晶亮多重反光高光
+      const hx = isRight ? 116 : 140;
+      ctx.beginPath();
+      ctx.arc(hx, 96, 24, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(128 + (isRight ? 24 : -24), 154, 12, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(128, 180, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.restore();
+
+      // 精緻上眼線與睫毛
+      ctx.beginPath();
+      ctx.ellipse(128, 128, 92, 108, 0, Math.PI * 1.05, Math.PI * 1.95);
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 16;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // 俏麗側邊小睫毛
+      ctx.beginPath();
+      if (isRight) {
+        ctx.moveTo(220, 110);
+        ctx.lineTo(245, 95);
+      } else {
+        ctx.moveTo(36, 110);
+        ctx.lineTo(11, 95);
+      }
+      ctx.strokeStyle = '#18181b';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      // 下眼線
+      ctx.beginPath();
+      ctx.ellipse(128, 128, 92, 108, 0, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.strokeStyle = '#27272a';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.generateMipmaps = true;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.needsUpdate = true;
+      return tex;
+    }
+
     function updateCharacterModel() {
-      let imgSrc = state.customImgSrc;
-      let preset = CHARACTER_PRESETS[state.currentChar];
-      if (!imgSrc && preset) {
-        imgSrc = preset.src;
+      const statusLabel = document.getElementById('char-status-label');
+      
+      if (girl3DMesh) {
+        characterGroup.remove(girl3DMesh);
+        girl3DMesh = null;
       }
 
-      processImageToTexture(imgSrc, state.currentChar, (texture, aspect) => {
+      // 若尚未生成自訂圖像，載入內建高畫質 Q 版全身人物 (SVG Vector 1800x2400)
+      if (!state.customImgSrc) {
+        processImageToTexture(null, 'ai-character', (texture, aspect) => {
+          if (charMesh) characterGroup.remove(charMesh);
+
+          const planeHeight = 3.1;
+          const planeWidth = planeHeight * aspect;
+          const geo = new THREE.PlaneGeometry(planeWidth, planeHeight);
+          const mat = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true
+          });
+
+          charMesh = new THREE.Mesh(geo, mat);
+          charMesh.position.set(0, 0, -0.01);
+          characterGroup.add(charMesh);
+
+          // 為人物模型掛載 3D 動態眨眼雙眼 (隨機間隔與情緒聯動)
+          const eyeGeo = new THREE.PlaneGeometry(0.25, 0.28);
+          const leftEyeMat = new THREE.MeshBasicMaterial({
+            map: createCharacterEyeTexture(false),
+            transparent: true,
+            depthWrite: false
+          });
+          const leftEye = new THREE.Mesh(eyeGeo, leftEyeMat);
+          leftEye.position.set(-0.185, 0.745, 0.005);
+          charMesh.add(leftEye);
+
+          const rightEyeMat = new THREE.MeshBasicMaterial({
+            map: createCharacterEyeTexture(true),
+            transparent: true,
+            depthWrite: false
+          });
+          const rightEye = new THREE.Mesh(eyeGeo, rightEyeMat);
+          rightEye.position.set(0.225, 0.745, 0.005);
+          charMesh.add(rightEye);
+
+          charMesh.userData = {
+            leftEye: leftEye,
+            rightEye: rightEye
+          };
+
+          const p = CHARACTER_PRESETS['ai-character'];
+          heartMesh.position.set(p.heart.x, p.heart.y, 0.05);
+          heartMesh.scale.set(p.heart.scale, p.heart.scale, 1);
+          if (heartHitProxy) {
+            heartHitProxy.position.set(p.heart.x, p.heart.y, 0.08);
+          }
+
+          gutMesh.position.set(p.gut.x, p.gut.y, 0.05);
+          gutMesh.scale.set(p.gut.scale, p.gut.scale, 1);
+          if (gutHitProxy) {
+            gutHitProxy.position.set(p.gut.x, p.gut.y, 0.08);
+          }
+
+          if (statusLabel) {
+            statusLabel.innerText = '模型：✨ Q 版雙馬尾少女 (粉紅娃娃鞋．自然下垂)';
+          }
+        });
+        return;
+      }
+
+      // 當使用者透過 Google Gemma 4 生成角色後，投影至 3D 聽診場景
+      let imgSrc = state.customImgSrc;
+      let preset = CHARACTER_PRESETS['ai-character'];
+
+      processImageToTexture(imgSrc, 'custom', (texture, aspect) => {
         if (charMesh) characterGroup.remove(charMesh);
 
         const planeHeight = 3.1;
@@ -1094,62 +4664,61 @@
         charMesh.position.set(0, 0, -0.01);
         characterGroup.add(charMesh);
 
-        const p = preset || CHARACTER_PRESETS.girl;
+        // 為自訂生成角色掛載動態眨眼
+        const eyeGeo = new THREE.PlaneGeometry(0.25, 0.28);
+        const leftEyeMat = new THREE.MeshBasicMaterial({
+          map: createCharacterEyeTexture(false),
+          transparent: true,
+          depthWrite: false
+        });
+        const leftEye = new THREE.Mesh(eyeGeo, leftEyeMat);
+        leftEye.position.set(-0.185, 0.745, 0.005);
+        charMesh.add(leftEye);
+
+        const rightEyeMat = new THREE.MeshBasicMaterial({
+          map: createCharacterEyeTexture(true),
+          transparent: true,
+          depthWrite: false
+        });
+        const rightEye = new THREE.Mesh(eyeGeo, rightEyeMat);
+        rightEye.position.set(0.225, 0.745, 0.005);
+        charMesh.add(rightEye);
+
+        charMesh.userData = {
+          leftEye: leftEye,
+          rightEye: rightEye
+        };
+
+        const p = preset || CHARACTER_PRESETS['ai-character'];
         heartMesh.position.set(p.heart.x, p.heart.y, 0.05);
         heartMesh.scale.set(p.heart.scale, p.heart.scale, 1);
+        if (heartHitProxy) {
+          heartHitProxy.position.set(p.heart.x, p.heart.y, 0.08);
+        }
 
         gutMesh.position.set(p.gut.x, p.gut.y, 0.05);
         gutMesh.scale.set(p.gut.scale, p.gut.scale, 1);
+        if (gutHitProxy) {
+          gutHitProxy.position.set(p.gut.x, p.gut.y, 0.08);
+        }
+
+        if (statusLabel) {
+          statusLabel.innerText = '模型：✨ Google Gemma 4 生成角色 (動態聽診)';
+        }
       });
     }
 
-    /* 點擊與拖曳互動 */
+    /* 點擊聽診切換與縮放互動（固定正面視角，不進行翻轉旋轉） */
     function setupMouseInteraction(container) {
-      let isDragging = false;
-      let previousMousePosition = { x: 0, y: 0 };
-      let dragStartPos = { x: 0, y: 0 };
-
-      container.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        dragStartPos = { x: e.clientX, y: e.clientY };
-        previousMousePosition = { x: e.clientX, y: e.clientY };
-      });
-
-      container.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-          const deltaMove = {
-            x: e.clientX - previousMousePosition.x,
-            y: e.clientY - previousMousePosition.y
-          };
-
-          characterGroup.rotation.y += deltaMove.x * 0.01;
-          characterGroup.rotation.x += deltaMove.y * 0.01;
-
-          // Limit rotation
-          characterGroup.rotation.x = Math.max(-0.5, Math.min(0.5, characterGroup.rotation.x));
-          characterGroup.rotation.y = Math.max(-1.0, Math.min(1.0, characterGroup.rotation.y));
-
-          previousMousePosition = { x: e.clientX, y: e.clientY };
-        }
-      });
-
-      container.addEventListener('mouseup', (e) => {
-        isDragging = false;
-      });
-
-      container.addEventListener('mouseleave', () => {
-        isDragging = false;
-      });
-
       container.addEventListener('wheel', (e) => {
         e.preventDefault();
         characterGroup.scale.x += e.deltaY * -0.001;
         characterGroup.scale.y += e.deltaY * -0.001;
         characterGroup.scale.z += e.deltaY * -0.001;
 
-        // limit scale
+        // 縮放範圍限制
         const minScale = 0.5;
-        const maxScale = 2.0;
+        const maxScale = 2.2;
         characterGroup.scale.x = Math.max(minScale, Math.min(maxScale, characterGroup.scale.x));
         characterGroup.scale.y = Math.max(minScale, Math.min(maxScale, characterGroup.scale.y));
         characterGroup.scale.z = Math.max(minScale, Math.min(maxScale, characterGroup.scale.z));
@@ -1157,29 +4726,42 @@
 
       container.addEventListener('dblclick', () => {
         characterGroup.rotation.set(0, 0, 0);
-        characterGroup.scale.set(1.1, 1.1, 1.1);
+        characterGroup.scale.set(1.05, 1.05, 1.05);
       });
 
       container.addEventListener('click', (e) => {
-        // Only trigger click if we didn't drag significantly
-        const dist = Math.hypot(e.clientX - dragStartPos.x, e.clientY - dragStartPos.y);
-        if (dist > 5) return;
-
         const rect = container.getBoundingClientRect();
         mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
         mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
 
         raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects([heartMesh, gutMesh]);
+        const targets = [heartHitProxy, gutHitProxy, heartMesh, gutMesh].filter(Boolean);
+        const intersects = raycaster.intersectObjects(targets);
 
         if (intersects.length > 0) {
           const clicked = intersects[0].object.userData.type;
-          setMode(clicked);
+          toggleOrgan(clicked);
         }
       });
 
-      document.getElementById('tag-heart').addEventListener('click', () => setMode('heart'));
-      document.getElementById('tag-gut').addEventListener('click', () => setMode('gut'));
+      container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const targets = [heartHitProxy, gutHitProxy, heartMesh, gutMesh].filter(Boolean);
+        const intersects = raycaster.intersectObjects(targets);
+
+        if (intersects.length > 0) {
+          container.style.cursor = 'pointer';
+        } else {
+          container.style.cursor = 'default';
+        }
+      });
+
+      document.getElementById('tag-heart').addEventListener('click', () => toggleOrgan('heart'));
+      document.getElementById('tag-gut').addEventListener('click', () => toggleOrgan('gut'));
     }
 
     /* ==========================================
@@ -1297,39 +4879,154 @@
 
       const time = nowTime * 0.001;
       const nut = NUTRITION_CONFIGS[state.nutrition];
+      const emo = EMOTION_CONFIGS[state.emotion || 'calm'] || EMOTION_CONFIGS.calm;
 
-      // 自然呼吸輕微起伏（原定角狀態）
+      // 自然呼吸輕微起伏
       if (characterGroup) {
-        characterGroup.position.y = Math.sin(time * nut.breathSpeed * 2) * 0.03;
-        // allow rotation by drag
+        characterGroup.position.y = Math.sin(time * emo.breathSpeed * 2) * 0.03;
       }
 
-      // 腸胃動態
-      if (gutMesh) {
-        const gutScale = 1 + Math.sin(time * 3) * 0.04;
-        gutMesh.scale.y = gutScale;
+      // 更新生理隨機眨眼引擎
+      blinkEngine.update(deltaTime);
+
+      // 3D Q 版小女孩專屬立體動態 (頭部呼吸微傾、呆毛 Q 彈、手臂微揚、胸腔呼吸、即時隨機眨眼)
+      if (girl3DMesh && girl3DMesh.userData) {
+        const ud = girl3DMesh.userData;
+        if (ud.headGroup) {
+          ud.headGroup.rotation.z = Math.sin(time * 1.5) * emo.headTilt;
+          ud.headGroup.rotation.x = Math.sin(time * emo.breathSpeed * 2) * (emo.headTilt * 0.6);
+        }
+        if (ud.ahoge) {
+          const jitterMult = state.emotion === 'anxious' ? 2.2 : (state.emotion === 'excited' ? 1.6 : 1.0);
+          ud.ahoge.rotation.z = Math.sin(time * 3.8 * jitterMult) * (0.14 * jitterMult);
+          ud.ahoge.rotation.x = Math.cos(time * 2.5 * jitterMult) * 0.06;
+        }
+        if (ud.leftArmGroup) {
+          ud.leftArmGroup.rotation.x = Math.sin(time * 1.8) * 0.05;
+        }
+        if (ud.rightArmGroup) {
+          ud.rightArmGroup.rotation.z = 0.05 + Math.sin(time * 2.2) * 0.08;
+          ud.rightArmGroup.rotation.x = Math.cos(time * 1.8) * 0.06;
+        }
+        if (ud.torsoGroup) {
+          const bScale = 1 + Math.sin(time * emo.breathSpeed * 2) * 0.018;
+          ud.torsoGroup.scale.set(bScale, bScale, bScale);
+        }
+
+        // 自然動態隨機眨眼
+        if (ud.leftEye) {
+          ud.leftEye.scale.y = blinkEngine.scaleY;
+          ud.leftEye.scale.x = blinkEngine.scaleX;
+        }
+        if (ud.rightEye) {
+          ud.rightEye.scale.y = blinkEngine.scaleY;
+          ud.rightEye.scale.x = blinkEngine.scaleX;
+        }
       }
 
-      // 繪製波形
+      // 自訂人物模型 (charMesh) 3D 雙眼隨機眨眼更新
+      if (charMesh && charMesh.userData) {
+        if (charMesh.userData.leftEye) {
+          charMesh.userData.leftEye.scale.y = blinkEngine.scaleY;
+          charMesh.userData.leftEye.scale.x = blinkEngine.scaleX;
+        }
+        if (charMesh.userData.rightEye) {
+          charMesh.userData.rightEye.scale.y = blinkEngine.scaleY;
+          charMesh.userData.rightEye.scale.x = blinkEngine.scaleX;
+        }
+      }
+
+      // 繪製波形並取得 ECG 週期狀態
       const isQRS = drawECGFrame(deltaTime);
       drawGutFrame();
 
-      // QRS 峰值與心臟搏動
+      // 1. 生理學真實心臟搏動與心尖螺旋扭轉 (Physiological Cardiac Mechanics - Wiggers Cycle)
+      if (heartMesh) {
+        const preset = CHARACTER_PRESETS['ai-character'];
+        const baseS = preset.heart.scale;
+        const baseX = preset.heart.x;
+        const baseY = preset.heart.y;
+
+        let scaleX = 1.0;
+        let scaleY = 1.0;
+        let rotZ = 0.0;
+        let offsetY = 0.0;
+
+        if (ecgPhase >= 0.14 && ecgPhase < 0.23) {
+          // 心房收縮充盈期 (Atrial Systole / P波): 心室充盈末期，心肌微幅舒張 (+2.5%)
+          const k = (ecgPhase - 0.14) / 0.09;
+          const atrialKick = Math.sin(k * Math.PI) * 0.03;
+          scaleX = 1.0 + atrialKick * 0.8;
+          scaleY = 1.0 + atrialKick;
+          rotZ = -atrialKick * 0.15;
+        } else if (ecgPhase >= 0.28 && ecgPhase < 0.38) {
+          // 心室快速等容收縮與強烈射血期 (Ventricular Systole - S1 / Lub / QRS Peak)
+          // 心尖逆時針旋轉扭轉 (Apex Wringing Twist)、心室向內收縮噴血
+          const k = (ecgPhase - 0.28) / 0.10;
+          const systolePower = Math.sin(k * Math.PI);
+          scaleX = 1.0 - systolePower * 0.14;
+          scaleY = 1.0 - systolePower * 0.10;
+          rotZ = systolePower * 0.075; // 心尖旋轉扭動約 4.3 度
+          offsetY = systolePower * 0.012; // 射血時心臟微幅上提
+        } else if (ecgPhase >= 0.38 && ecgPhase < 0.48) {
+          // 心室減慢射血與等容舒張期 (Isovolumetric Relaxation - S2 / Dub)
+          // 主動脈瓣與肺動脈瓣關閉，彈性回彈與反向輕微超額舒張 (+5% rebound)
+          const k = (ecgPhase - 0.38) / 0.10;
+          const rebound = Math.sin(k * Math.PI);
+          scaleX = 1.0 + rebound * 0.055;
+          scaleY = 1.0 + rebound * 0.035;
+          rotZ = -rebound * 0.025; // 反向回彈釋放
+          offsetY = -rebound * 0.005;
+        } else if (ecgPhase >= 0.48 && ecgPhase < 0.65) {
+          // 心室快速充盈期 (Rapid Inflow / T波): 血液由靜脈大量回流，平緩過渡至靜息基準
+          const k = (ecgPhase - 0.48) / 0.17;
+          const decay = Math.cos(k * (Math.PI / 2));
+          scaleX = 1.0 + decay * 0.025;
+          scaleY = 1.0 + decay * 0.015;
+          rotZ = decay * -0.01;
+        }
+
+        heartMesh.scale.set(baseS * scaleX, baseS * scaleY, 1);
+        heartMesh.rotation.z = rotZ;
+        heartMesh.position.set(baseX, baseY + offsetY, 0.05);
+      }
+
+      // 2. 生理學真實胃腸蠕動波與分節運動力學 (Physiological Gastrointestinal Peristalsis)
+      if (gutMesh) {
+        const preset = CHARACTER_PRESETS['ai-character'];
+        const baseS = preset.gut.scale;
+        const baseX = preset.gut.x;
+        const baseY = preset.gut.y;
+
+        // 胃慢波 (BER) 與小腸分節推進波 (Segmental Contractions)
+        const gutFreq = 1.1 * nut.breathSpeed;
+        
+        // 蠕動行進波 (Phase-shifted Traveling Waves)
+        const waveA = Math.sin(time * gutFreq * 1.6);
+        const waveB = Math.cos(time * gutFreq * 1.6 + 0.9);
+        
+        // 橫截面收縮與容積守恆補償 (Fluid Incompressibility Conservation)
+        const segmentSqueeze = Math.sin(time * gutFreq * 2.3 + 1.5) * (0.028 + nut.jitter * 0.2);
+        const lateralComp = -segmentSqueeze * 0.72;
+
+        // 腸繫膜微幅生理擺動與起伏
+        const swayAngle = Math.sin(time * gutFreq * 0.85) * 0.022;
+        const heaveY = Math.sin(time * gutFreq * 1.25) * 0.012 + Math.sin(time * nut.breathSpeed * 2) * 0.006;
+        const shiftX = Math.cos(time * gutFreq * 0.7) * 0.006;
+
+        gutMesh.scale.set(
+          baseS * (1.0 + waveA * 0.025 + lateralComp),
+          baseS * (1.0 + waveB * 0.03 + segmentSqueeze),
+          1
+        );
+        gutMesh.rotation.z = swayAngle;
+        gutMesh.position.set(baseX + shiftX, baseY + heaveY, 0.05);
+      }
+
+      // QRS 峰值與心音觸發 (S1/S2 心音節律同步)
       if (isQRS && Date.now() - lastBeatTime > (60000 / state.bpm) * 0.7) {
         lastBeatTime = Date.now();
         if (state.mode === 'heart') playHeartSound();
-
-        if (heartMesh) {
-          const preset = CHARACTER_PRESETS[state.currentChar] || CHARACTER_PRESETS.girl;
-          const baseS = preset.heart.scale;
-          heartMesh.scale.set(baseS * 0.85, baseS * 1.25, 1);
-          heartMesh.rotation.z = 0.15;
-
-          setTimeout(() => {
-            heartMesh.scale.set(baseS, baseS, 1);
-            heartMesh.rotation.z = 0;
-          }, 120);
-        }
       }
 
       // 更新 SVG 連線
@@ -1350,7 +5047,9 @@
       const h = container.clientHeight;
 
       const lineHeart = document.getElementById('line-heart');
+      const dotHeart = document.getElementById('dot-heart');
       const lineGut = document.getElementById('line-gut');
+      const dotGut = document.getElementById('dot-gut');
 
       const get2DPos = (obj) => {
         const vec = new THREE.Vector3();
@@ -1362,22 +5061,46 @@
         };
       };
 
-      const heartPos = get2DPos(heartMesh);
-      const gutPos = get2DPos(gutMesh);
-
-      const tagHeart = document.getElementById('tag-heart').getBoundingClientRect();
-      const tagGut = document.getElementById('tag-gut').getBoundingClientRect();
       const parentRect = container.getBoundingClientRect();
 
-      lineHeart.setAttribute('x1', tagHeart.right - parentRect.left);
-      lineHeart.setAttribute('y1', tagHeart.top + tagHeart.height/2 - parentRect.top);
-      lineHeart.setAttribute('x2', heartPos.x);
-      lineHeart.setAttribute('y2', heartPos.y);
+      if (state.mode === 'heart' && heartMesh.visible) {
+        if (lineHeart) lineHeart.style.display = 'block';
+        if (dotHeart) dotHeart.style.display = 'block';
+        if (lineGut) lineGut.style.display = 'none';
+        if (dotGut) dotGut.style.display = 'none';
 
-      lineGut.setAttribute('x1', tagGut.left - parentRect.left);
-      lineGut.setAttribute('y1', tagGut.top + tagGut.height/2 - parentRect.top);
-      lineGut.setAttribute('x2', gutPos.x);
-      lineGut.setAttribute('y2', gutPos.y);
+        const heartPos = get2DPos(heartMesh);
+        const tagHeart = document.getElementById('tag-heart').getBoundingClientRect();
+        const hx1 = tagHeart.left - parentRect.left;
+        const hy1 = tagHeart.top + tagHeart.height / 2 - parentRect.top;
+        lineHeart.setAttribute('x1', hx1);
+        lineHeart.setAttribute('y1', hy1);
+        lineHeart.setAttribute('x2', heartPos.x);
+        lineHeart.setAttribute('y2', heartPos.y);
+        dotHeart.setAttribute('cx', heartPos.x);
+        dotHeart.setAttribute('cy', heartPos.y);
+      } else if (state.mode === 'gut' && gutMesh.visible) {
+        if (lineHeart) lineHeart.style.display = 'none';
+        if (dotHeart) dotHeart.style.display = 'none';
+        if (lineGut) lineGut.style.display = 'block';
+        if (dotGut) dotGut.style.display = 'block';
+
+        const gutPos = get2DPos(gutMesh);
+        const tagGut = document.getElementById('tag-gut').getBoundingClientRect();
+        const gx1 = tagGut.left - parentRect.left;
+        const gy1 = tagGut.top + tagGut.height / 2 - parentRect.top;
+        lineGut.setAttribute('x1', gx1);
+        lineGut.setAttribute('y1', gy1);
+        lineGut.setAttribute('x2', gutPos.x);
+        lineGut.setAttribute('y2', gutPos.y);
+        dotGut.setAttribute('cx', gutPos.x);
+        dotGut.setAttribute('cy', gutPos.y);
+      } else {
+        if (lineHeart) lineHeart.style.display = 'none';
+        if (dotHeart) dotHeart.style.display = 'none';
+        if (lineGut) lineGut.style.display = 'none';
+        if (dotGut) dotGut.style.display = 'none';
+      }
     }
 
     /* ==========================================
@@ -1426,46 +5149,20 @@
         }
       });
 
-      // 聽診模式
-      document.getElementById('mode-heart').addEventListener('click', () => setMode('heart'));
-      document.getElementById('mode-gut').addEventListener('click', () => setMode('gut'));
+      // 器官動態檢視按鈕 (點擊展開/收合)
+      document.getElementById('mode-heart').addEventListener('click', () => toggleOrgan('heart'));
+      document.getElementById('mode-gut').addEventListener('click', () => toggleOrgan('gut'));
 
-      // 角色選擇
-      const charSelect = document.getElementById('char-select');
-      const fileInput = document.getElementById('file-input');
+      // 匯出高畫質透明 PNG
+      const btnExportPng = document.getElementById('btn-export-png');
+      if (btnExportPng) btnExportPng.addEventListener('click', exportPNG);
 
-      charSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'upload') {
-          fileInput.click();
-        } else {
-          state.currentChar = e.target.value;
-          state.customImgSrc = null;
-          updateCharacterModel();
-        }
-      });
-
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (evt) => {
-            state.customImgSrc = evt.target.result;
-            state.currentChar = 'custom';
-
-            let customOption = charSelect.querySelector('option[value="custom"]');
-            if (!customOption) {
-              customOption = document.createElement('option');
-              customOption.value = 'custom';
-              customOption.innerText = '🖼️ 自訂上傳圖片';
-              charSelect.insertBefore(customOption, charSelect.querySelector('option[value="upload"]'));
-            }
-            charSelect.value = 'custom';
-            updateCharacterModel();
-          };
-          reader.readAsDataURL(file);
-        } else {
-          charSelect.value = state.currentChar;
-        }
+      // 心理與情緒狀態控制按鈕
+      document.querySelectorAll('.btn-emotion').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const emoKey = btn.getAttribute('data-emotion');
+          blinkEngine.setEmotion(emoKey);
+        });
       });
 
       // 營養狀態
@@ -1478,15 +5175,45 @@
           state.nutrition = key;
           const config = NUTRITION_CONFIGS[key];
 
-          state.bpm = config.bpm;
-          document.getElementById('bpm-slider').value = config.bpm;
-          document.getElementById('bpm-val').innerText = `${config.bpm} BPM`;
+          if (document.getElementById('bpm-slider')) document.getElementById('bpm-slider').value = config.bpm;
+          if (document.getElementById('bpm-val')) document.getElementById('bpm-val').innerText = `${config.bpm} BPM`;
 
-          document.getElementById('nutri-desc').innerText = config.desc;
-          document.getElementById('disp-nutri').innerText = config.name;
-          document.getElementById('disp-bpm').innerText = `${config.bpm} BPM`;
-          document.getElementById('disp-face').innerText = config.face;
-          document.getElementById('disp-emotion').innerText = config.emotion;
+          if (document.getElementById('nutri-desc')) document.getElementById('nutri-desc').innerText = config.desc;
+          if (document.getElementById('disp-nutri')) document.getElementById('disp-nutri').innerText = config.name;
+          if (document.getElementById('disp-bpm')) document.getElementById('disp-bpm').innerText = `${config.bpm} BPM`;
+          if (document.getElementById('disp-energy')) document.getElementById('disp-energy').innerText = config.energy;
+          if (document.getElementById('disp-health')) document.getElementById('disp-health').innerText = config.health;
+          if (document.getElementById('disp-heart-status')) document.getElementById('disp-heart-status').innerText = config.heartStatus || '活躍';
+          if (document.getElementById('disp-gut-status')) document.getElementById('disp-gut-status').innerText = config.gutStatus || '穩定';
+
+          // 同步情緒與眨眼生理狀態
+          if (config.emotionId) {
+            blinkEngine.setEmotion(config.emotionId);
+          } else {
+            blinkEngine.updateUI();
+          }
+
+          // 重新繪製 Q 版角色表情與器官以響應飲食狀態
+          updateCharacterModel();
+        });
+      });
+
+      // 字體大小控制
+      const fontBtns = document.querySelectorAll('.btn-font-scale');
+      const savedScale = localStorage.getItem('body_synth_font_scale') || '1.15';
+      document.documentElement.style.setProperty('--ui-font-scale', savedScale);
+      fontBtns.forEach(btn => {
+        if (btn.getAttribute('data-scale') === savedScale) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+        btn.addEventListener('click', () => {
+          fontBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const scale = btn.getAttribute('data-scale');
+          document.documentElement.style.setProperty('--ui-font-scale', scale);
+          localStorage.setItem('body_synth_font_scale', scale);
         });
       });
 
@@ -1498,6 +5225,8 @@
           document.getElementById('bpm-slider').value = bpm;
           document.getElementById('bpm-val').innerText = `${bpm} BPM`;
           document.getElementById('disp-bpm').innerText = `${bpm} BPM`;
+          blinkEngine.calculateNextInterval();
+          blinkEngine.updateUI();
         });
       });
 
@@ -1507,24 +5236,86 @@
         state.bpm = parseInt(e.target.value);
         document.getElementById('bpm-val').innerText = `${state.bpm} BPM`;
         document.getElementById('disp-bpm').innerText = `${state.bpm} BPM`;
+        blinkEngine.calculateNextInterval();
+        blinkEngine.updateUI();
       });
+
+      // 初始化眨眼與情緒介面
+      blinkEngine.calculateNextInterval();
+      blinkEngine.updateUI();
+    }
+
+    function toggleOrgan(targetMode) {
+      if (state.mode === targetMode) {
+        setMode('none');
+      } else {
+        setMode(targetMode);
+      }
     }
 
     function setMode(mode) {
       state.mode = mode;
       const btnHeart = document.getElementById('mode-heart');
       const btnGut = document.getElementById('mode-gut');
+      const tagHeart = document.getElementById('tag-heart');
+      const tagGut = document.getElementById('tag-gut');
+      const dispMode = document.getElementById('disp-mode');
+      const subHeart = tagHeart ? tagHeart.querySelector('.organ-card-sub') : null;
+      const subGut = tagGut ? tagGut.querySelector('.organ-card-sub') : null;
 
       if (mode === 'heart') {
-        btnHeart.className = 'btn-mode active-heart';
-        btnGut.className = 'btn-mode';
-        document.getElementById('disp-mode').innerText = '心臟模式';
-        document.getElementById('disp-mode').style.color = '#f472b6';
+        if (heartMesh) heartMesh.visible = true;
+        if (gutMesh) gutMesh.visible = false;
+        if (btnHeart) btnHeart.className = 'btn-mode active-heart';
+        if (btnGut) btnGut.className = 'btn-mode';
+        if (tagHeart) {
+          tagHeart.classList.add('active');
+          if (subHeart) subHeart.innerText = '點擊收合';
+        }
+        if (tagGut) {
+          tagGut.classList.remove('active');
+          if (subGut) subGut.innerText = '點擊展開';
+        }
+        if (dispMode) {
+          dispMode.innerText = '❤️ 心臟 (已展開)';
+          dispMode.style.color = '#f472b6';
+        }
+      } else if (mode === 'gut') {
+        if (heartMesh) heartMesh.visible = false;
+        if (gutMesh) gutMesh.visible = true;
+        if (btnHeart) btnHeart.className = 'btn-mode';
+        if (btnGut) btnGut.className = 'btn-mode active-gut';
+        if (tagHeart) {
+          tagHeart.classList.remove('active');
+          if (subHeart) subHeart.innerText = '點擊展開';
+        }
+        if (tagGut) {
+          tagGut.classList.add('active');
+          if (subGut) subGut.innerText = '點擊收合';
+        }
+        if (dispMode) {
+          dispMode.innerText = '🫁 腸胃 (已展開)';
+          dispMode.style.color = '#34d399';
+        }
       } else {
-        btnHeart.className = 'btn-mode';
-        btnGut.className = 'btn-mode active-gut';
-        document.getElementById('disp-mode').innerText = '腸胃模式';
-        document.getElementById('disp-mode').style.color = '#34d399';
+        // 'none' - 收合所有器官，展示乾淨完整角色
+        state.mode = 'none';
+        if (heartMesh) heartMesh.visible = false;
+        if (gutMesh) gutMesh.visible = false;
+        if (btnHeart) btnHeart.className = 'btn-mode';
+        if (btnGut) btnGut.className = 'btn-mode';
+        if (tagHeart) {
+          tagHeart.classList.remove('active');
+          if (subHeart) subHeart.innerText = '點擊展開';
+        }
+        if (tagGut) {
+          tagGut.classList.remove('active');
+          if (subGut) subGut.innerText = '點擊展開';
+        }
+        if (dispMode) {
+          dispMode.innerText = '👤 全身檢視 (器官已收合)';
+          dispMode.style.color = '#64748b';
+        }
       }
     }
 
@@ -1535,16 +5326,25 @@
       initThree();
       initWaveCanvases();
       setupUI();
+      setMode('none');
       animate();
 
-      window.addEventListener('resize', () => {
+      function handleResize() {
         const container = document.getElementById('right-display');
-        const w = container.clientWidth;
-        const h = container.clientHeight;
+        if (!container || !camera || !renderer) return;
+        const w = container.clientWidth || (window.innerWidth > 1024 ? window.innerWidth * 0.58 : window.innerWidth);
+        const h = container.clientHeight || 700;
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
         renderer.setSize(w, h);
-      });
+      }
+
+      window.addEventListener('resize', handleResize);
+      if (window.ResizeObserver) {
+        const ro = new ResizeObserver(() => handleResize());
+        const rightPanel = document.getElementById('right-display');
+        if (rightPanel) ro.observe(rightPanel);
+      }
     });
   </script>
 </body>

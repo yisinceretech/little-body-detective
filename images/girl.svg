@@ -1,0 +1,883 @@
+<svg
+  id="character"
+  viewBox="0 0 600 800"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-label="全身 Q 版人物 - 雙馬尾 粉紅娃娃鞋 自然下垂"
+>
+  <defs>
+    <!-- 頭髮光澤漸層 -->
+    <linearGradient id="hairGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2d2938" />
+      <stop offset="48%" stop-color="#14151f" />
+      <stop offset="100%" stop-color="#07080d" />
+    </linearGradient>
+
+    <!-- 雙馬尾柔和髮絲漸層 -->
+    <linearGradient id="pigtailLeftGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#343042" />
+      <stop offset="50%" stop-color="#161722" />
+      <stop offset="100%" stop-color="#090a10" />
+    </linearGradient>
+
+    <linearGradient id="pigtailRightGrad" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#343042" />
+      <stop offset="50%" stop-color="#161722" />
+      <stop offset="100%" stop-color="#090a10" />
+    </linearGradient>
+
+    <!-- 髮圈漸層 (粉色蝴蝶結/髮圈) -->
+    <linearGradient id="hairTieGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#db2777" />
+    </linearGradient>
+
+    <!-- 脖子與下巴陰影漸層 -->
+    <linearGradient id="neckGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5c7b3" />
+      <stop offset="35%" stop-color="#fedfd0" />
+      <stop offset="75%" stop-color="#ffe8dc" />
+      <stop offset="100%" stop-color="#ffd5c2" />
+    </linearGradient>
+
+    <!-- 皮膚漸層 -->
+    <linearGradient id="skinGradient" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#fff8f2" />
+      <stop offset="58%" stop-color="#ffe5d7" />
+      <stop offset="100%" stop-color="#ffcbb8" />
+    </linearGradient>
+
+    <!-- 粉色 PUMA 上衣 -->
+    <linearGradient id="shirtGradient" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#ffb6cf" />
+      <stop offset="55%" stop-color="#f88fb5" />
+      <stop offset="100%" stop-color="#e978a0" />
+    </linearGradient>
+
+    <!-- 藍色波浪短褲 -->
+    <linearGradient id="shortsGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#bfe8ff" />
+      <stop offset="52%" stop-color="#8acdf7" />
+      <stop offset="100%" stop-color="#5aa9e7" />
+    </linearGradient>
+
+    <!-- 眼睛剪裁路徑 (確保眼珠高光絕對不超出眼眶) -->
+    <clipPath id="leftEyeClip">
+      <path d="M 223 204 C 233 184 269 182 281 204 C 271 232 233 234 223 204 Z" />
+    </clipPath>
+    <clipPath id="rightEyeClip">
+      <path d="M 331 204 C 343 182 379 184 389 204 C 379 234 341 232 331 204 Z" />
+    </clipPath>
+
+    <!-- 粉紅娃娃鞋漸層 (Patent Leather Pink Doll Shoes) -->
+    <linearGradient id="shoePinkGrad" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0%" stop-color="#fbcfe8" />
+      <stop offset="35%" stop-color="#f472b6" />
+      <stop offset="85%" stop-color="#db2777" />
+      <stop offset="100%" stop-color="#9d174d" />
+    </linearGradient>
+
+    <!-- 娃娃鞋內裡陰影 -->
+    <linearGradient id="shoeInnerGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fda4af" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+
+    <!-- 珍珠/金屬釦漸層 -->
+    <linearGradient id="buckleGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="45%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#eab308" />
+    </linearGradient>
+
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow
+        dx="0"
+        dy="6"
+        stdDeviation="6"
+        flood-color="#0f172a"
+        flood-opacity="0.18"
+      />
+    </filter>
+
+    <filter id="smallShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow
+        dx="0"
+        dy="3"
+        stdDeviation="3"
+        flood-color="#0f172a"
+        flood-opacity="0.12"
+      />
+    </filter>
+
+    <!-- 蕾絲花紋 -->
+    <pattern
+      id="lacePattern"
+      width="28"
+      height="16"
+      patternUnits="userSpaceOnUse"
+    >
+      <path
+        d="M1 5 C7 14 21 14 27 5"
+        fill="none"
+        stroke="#ffffff"
+        stroke-width="2.5"
+      />
+      <circle cx="14" cy="8" r="2.5" fill="#ffffff" />
+    </pattern>
+  </defs>
+
+  <!-- 地面陰影 (半透明深色陰影，完美融入網頁與 3D 背景) -->
+  <ellipse
+    cx="305"
+    cy="745"
+    rx="135"
+    ry="18"
+    fill="#0f172a"
+    opacity="0.20"
+  />
+
+  <!-- ==================== 雙馬尾 (後層) ==================== -->
+  <!-- 左雙馬尾 (主束) -->
+  <path
+    d="
+      M 172 178
+      C 118 195 90 265 98 348
+      C 105 405 125 458 145 492
+      C 152 472 148 430 138 385
+      C 128 335 136 270 162 215
+      C 172 195 182 186 186 182
+      Z
+    "
+    fill="url(#pigtailLeftGrad)"
+    stroke="#22202c"
+    stroke-width="4.5"
+    stroke-linejoin="round"
+  />
+  <!-- 左雙馬尾 (副髮束與飄逸髮絲) -->
+  <path
+    d="
+      M 108 300
+      C 94 360 106 430 132 478
+      C 125 440 120 380 126 325
+      Z
+    "
+    fill="#171822"
+  />
+  <path
+    d="M 125 240 C 108 305 116 385 142 455"
+    fill="none"
+    stroke="#433f52"
+    stroke-width="4"
+    stroke-linecap="round"
+    opacity="0.6"
+  />
+  <path
+    d="M 148 260 C 132 330 138 410 152 470"
+    fill="none"
+    stroke="#655f75"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.45"
+  />
+
+  <!-- 右雙馬尾 (主束) -->
+  <path
+    d="
+      M 436 178
+      C 490 195 518 265 510 348
+      C 503 405 483 458 463 492
+      C 456 472 460 430 470 385
+      C 480 335 472 270 446 215
+      C 436 195 426 186 422 182
+      Z
+    "
+    fill="url(#pigtailRightGrad)"
+    stroke="#22202c"
+    stroke-width="4.5"
+    stroke-linejoin="round"
+  />
+  <!-- 右雙馬尾 (副髮束與飄逸髮絲) -->
+  <path
+    d="
+      M 500 300
+      C 514 360 502 430 476 478
+      C 483 440 488 380 482 325
+      Z
+    "
+    fill="#171822"
+  />
+  <path
+    d="M 483 240 C 500 305 492 385 466 455"
+    fill="none"
+    stroke="#433f52"
+    stroke-width="4"
+    stroke-linecap="round"
+    opacity="0.6"
+  />
+  <path
+    d="M 460 260 C 476 330 470 410 456 470"
+    fill="none"
+    stroke="#655f75"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.45"
+  />
+
+  <!-- 後方頭部頭髮輪廓 (乾淨收於頭部後方，移除垂落至肩頸的多餘髮片) -->
+  <path
+    d="
+      M 174 168
+      C 170 75 230 25 308 30
+      C 395 35 440 95 434 185
+      C 432 225 390 245 350 250
+      L 260 250
+      C 220 245 176 225 174 168
+      Z
+    "
+    fill="url(#hairGradient)"
+    stroke="#24222d"
+    stroke-width="5"
+  />
+
+  <!-- 脖子 (位於頭部後方、肩膀與上衣領口之間，呈現自然圓滑銜接與下巴陰影) -->
+  <g id="neckGroup">
+    <path
+      d="
+        M 276 240
+        L 272 328
+        C 285 342 323 342 336 328
+        L 332 240
+        Z
+      "
+      fill="url(#neckGradient)"
+      stroke="#d69787"
+      stroke-width="3"
+    />
+    <!-- 下巴在頸部的柔和立體陰影 -->
+    <path
+      d="
+        M 274 278
+        C 290 310 318 310 334 278
+        C 324 296 286 296 274 278
+        Z
+      "
+      fill="#e0998a"
+      opacity="0.35"
+    />
+  </g>
+
+  <!-- 耳朵 -->
+  <ellipse
+    cx="185"
+    cy="208"
+    rx="25"
+    ry="34"
+    fill="url(#skinGradient)"
+    stroke="#d99383"
+    stroke-width="3"
+  />
+  <ellipse
+    cx="423"
+    cy="208"
+    rx="25"
+    ry="34"
+    fill="url(#skinGradient)"
+    stroke="#d99383"
+    stroke-width="3"
+  />
+
+  <!-- 臉蛋輪廓 -->
+  <path
+    d="
+      M 184 153
+      C 199 88 260 66 320 68
+      C 386 69 427 110 424 178
+      C 421 253 375 292 307 300
+      C 240 297 195 260 184 198
+      C 181 183 181 167 184 153
+      Z
+    "
+    fill="url(#skinGradient)"
+    stroke="#d69787"
+    stroke-width="4"
+  />
+
+  <!-- 雙馬尾綁帶 (左髮圈蝴蝶結) -->
+  <g transform="translate(172 176) rotate(-15)">
+    <ellipse cx="0" cy="0" rx="14" ry="10" fill="url(#hairTieGrad)" stroke="#be185d" stroke-width="2" />
+    <circle cx="0" cy="0" r="5" fill="#fbcfe8" />
+  </g>
+
+  <!-- 雙馬尾綁帶 (右髮圈蝴蝶結) -->
+  <g transform="translate(436 176) rotate(15)">
+    <ellipse cx="0" cy="0" rx="14" ry="10" fill="url(#hairTieGrad)" stroke="#be185d" stroke-width="2" />
+    <circle cx="0" cy="0" r="5" fill="#fbcfe8" />
+  </g>
+
+  <!-- 齊瀏海 (甜美整齊) -->
+  <path
+    d="
+      M 181 166
+      C 180 95 235 52 311 55
+      C 370 57 413 91 426 149
+      C 399 127 365 110 329 104
+      C 300 99 277 105 250 120
+      C 229 131 208 148 181 166
+      Z
+    "
+    fill="url(#hairGradient)"
+    stroke="#24222d"
+    stroke-width="4"
+  />
+
+  <!-- 瀏海髮束細節 -->
+  <path d="M 232 88 C 247 121 236 152 223 177" fill="none" stroke="#3d3a49" stroke-width="5" stroke-linecap="round" />
+  <path d="M 278 64 C 292 106 278 145 259 172" fill="none" stroke="#3b3946" stroke-width="5" stroke-linecap="round" />
+  <path d="M 328 63 C 335 102 320 141 302 169" fill="none" stroke="#383642" stroke-width="5" stroke-linecap="round" />
+  <path d="M 375 80 C 376 113 359 143 342 169" fill="none" stroke="#34323e" stroke-width="5" stroke-linecap="round" />
+
+  <!-- 頭髮光澤高光 -->
+  <path
+    d="M 221 107 C 252 73 298 61 341 69"
+    fill="none"
+    stroke="#777184"
+    stroke-width="10"
+    stroke-linecap="round"
+    opacity="0.48"
+  />
+  <path
+    d="M 367 83 C 390 98 403 119 410 142"
+    fill="none"
+    stroke="#666173"
+    stroke-width="7"
+    stroke-linecap="round"
+    opacity="0.42"
+  />
+
+  <!-- 眉毛 (柔和自然黑曜眉) -->
+  <path d="M 226 182 C 243 172 264 172 278 180" fill="none" stroke="#18181b" stroke-width="4.5" stroke-linecap="round" />
+  <path d="M 334 180 C 348 172 369 172 386 182" fill="none" stroke="#18181b" stroke-width="4.5" stroke-linecap="round" />
+
+  <!-- 左眼 (純白眼底 + 純黑瞳孔與晶亮白高光，使用 clip-path 保證絕不溢出) -->
+  <g id="leftEye">
+    <!-- 眼白底色 -->
+    <path
+      d="M 223 204 C 233 184 269 182 281 204 C 271 232 233 234 223 204 Z"
+      fill="#ffffff"
+    />
+    <!-- 剪裁內的黑色眼珠與高光 -->
+    <g clip-path="url(#leftEyeClip)">
+      <!-- 純黑眼珠 (深邃漆黑) -->
+      <ellipse cx="253" cy="207" rx="16" ry="20" fill="#18181b" />
+      <circle cx="253" cy="207" r="10" fill="#000000" />
+      <!-- 純白反光晶亮高光 -->
+      <circle cx="247" cy="199" r="5.5" fill="#ffffff" />
+      <circle cx="258" cy="212" r="2.8" fill="#ffffff" />
+      <circle cx="250" cy="218" r="1.5" fill="#ffffff" />
+    </g>
+    <!-- 上眼線與下眼線 (純黑外框) -->
+    <path
+      d="M 223 204 C 233 184 269 182 281 204 C 271 232 233 234 223 204 Z"
+      fill="none"
+      stroke="#18181b"
+      stroke-width="4.5"
+    />
+    <!-- 加厚上眼瞼睫毛線 -->
+    <path d="M 221 204 C 233 183 269 181 283 204" fill="none" stroke="#18181b" stroke-width="5.5" stroke-linecap="round" />
+    <!-- 俏麗側邊小睫毛 -->
+    <path d="M 223 198 L 216 191" stroke="#18181b" stroke-width="3.5" stroke-linecap="round" />
+  </g>
+
+  <!-- 右眼 (純白眼底 + 純黑瞳孔與晶亮白高光，使用 clip-path 保證絕不溢出) -->
+  <g id="rightEye">
+    <!-- 眼白底色 -->
+    <path
+      d="M 331 204 C 343 182 379 184 389 204 C 379 234 341 232 331 204 Z"
+      fill="#ffffff"
+    />
+    <!-- 剪裁內的黑色眼珠與高光 -->
+    <g clip-path="url(#rightEyeClip)">
+      <!-- 純黑眼珠 (深邃漆黑) -->
+      <ellipse cx="359" cy="207" rx="16" ry="20" fill="#18181b" />
+      <circle cx="359" cy="207" r="10" fill="#000000" />
+      <!-- 純白反光晶亮高光 -->
+      <circle cx="353" cy="199" r="5.5" fill="#ffffff" />
+      <circle cx="364" cy="212" r="2.8" fill="#ffffff" />
+      <circle cx="356" cy="218" r="1.5" fill="#ffffff" />
+    </g>
+    <!-- 上眼線與下眼線 (純黑外框) -->
+    <path
+      d="M 331 204 C 343 182 379 184 389 204 C 379 234 341 232 331 204 Z"
+      fill="none"
+      stroke="#18181b"
+      stroke-width="4.5"
+    />
+    <!-- 加厚上眼瞼睫毛線 -->
+    <path d="M 329 204 C 343 181 379 183 391 204" fill="none" stroke="#18181b" stroke-width="5.5" stroke-linecap="round" />
+    <!-- 俏麗側邊小睫毛 -->
+    <path d="M 389 198 L 396 191" stroke="#18181b" stroke-width="3.5" stroke-linecap="round" />
+  </g>
+
+  <!-- 鼻子 -->
+  <path d="M 305 216 C 302 221 303 226 308 227" fill="none" stroke="#d99889" stroke-width="3" stroke-linecap="round" />
+
+  <!-- 腮紅 -->
+  <ellipse cx="224" cy="238" rx="22" ry="10" fill="#ff9ca4" opacity="0.32" />
+  <ellipse cx="388" cy="238" rx="22" ry="10" fill="#ff9ca4" opacity="0.32" />
+
+  <!-- 微笑嘴巴 -->
+  <path d="M 280 248 C 301 267 329 264 344 246" fill="none" stroke="#ad5d63" stroke-width="4" stroke-linecap="round" />
+
+  <!-- ==================== 手臂自然下垂 (兩側對稱垂放) ==================== -->
+  <!-- 左手臂 (自然下垂) -->
+  <g id="leftArmGroup">
+    <path
+      d="
+        M 218 360
+        C 200 395 198 440 206 480
+        C 208 495 218 498 226 492
+        C 234 485 238 460 240 425
+        L 242 368
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- 左手手掌與放鬆手指 (自然垂於身側) -->
+    <path
+      d="
+        M 206 480
+        C 206 498 212 510 220 508
+        C 228 506 230 495 226 485
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="3"
+    />
+  </g>
+
+  <!-- 右手臂 (自然下垂) -->
+  <g id="rightArmGroup">
+    <path
+      d="
+        M 390 360
+        C 408 395 410 440 402 480
+        C 400 495 390 498 382 492
+        C 374 485 370 460 368 425
+        L 366 368
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="4"
+      stroke-linejoin="round"
+    />
+    <!-- 右手手掌與放鬆手指 (自然垂於身側) -->
+    <path
+      d="
+        M 402 480
+        C 402 498 396 510 388 508
+        C 380 506 378 495 382 485
+        Z
+      "
+      fill="url(#skinGradient)"
+      stroke="#d69787"
+      stroke-width="3"
+    />
+  </g>
+
+  <!-- 上衣主體 (粉色 PUMA T-Shirt) -->
+  <path
+    d="
+      M 237 319
+      C 255 307 277 306 303 311
+      C 324 307 356 309 377 321
+      L 405 353
+      L 381 392
+      L 373 454
+      C 338 469 274 469 235 454
+      L 231 392
+      L 204 357
+      Z
+    "
+    fill="url(#shirtGradient)"
+    stroke="#cb678c"
+    stroke-width="4"
+    filter="url(#smallShadow)"
+  />
+
+  <!-- 左袖口 -->
+  <path
+    d="M 236 324 C 220 325 207 339 201 357 L 231 382 L 247 343 Z"
+    fill="#f68caf"
+    stroke="#cb678c"
+    stroke-width="4"
+  />
+
+  <!-- 右袖口 -->
+  <path
+    d="M 372 322 C 390 327 401 339 407 356 L 382 384 L 365 344 Z"
+    fill="#f68caf"
+    stroke="#cb678c"
+    stroke-width="4"
+  />
+
+  <!-- 領口 -->
+  <path d="M 273 316 C 283 335 325 337 339 315" fill="none" stroke="#ce668b" stroke-width="6" />
+  <path d="M 278 316 C 289 327 320 328 334 315" fill="none" stroke="#ffc4d7" stroke-width="3" />
+
+  <!-- 上衣皺褶 -->
+  <path d="M 258 365 C 269 390 266 421 260 448" fill="none" stroke="#e6759d" stroke-width="3" opacity="0.55" />
+  <path d="M 349 365 C 339 395 345 426 350 450" fill="none" stroke="#e6759d" stroke-width="3" opacity="0.55" />
+
+  <!-- 胸前 PUMA Logo 與跳躍美洲豹 -->
+  <g transform="translate(0 2)">
+    <text
+      x="303"
+      y="376"
+      text-anchor="middle"
+      fill="#ffffff"
+      font-family="Arial Black, Arial, sans-serif"
+      font-size="28"
+      font-weight="900"
+      letter-spacing="-1"
+    >
+      PUMA
+    </text>
+
+    <!-- 簡化跳躍貓形裝飾 -->
+    <g fill="#ffffff" transform="translate(336 340) scale(0.54)">
+      <ellipse cx="19" cy="12" rx="20" ry="7" transform="rotate(-14 19 12)" />
+      <circle cx="39" cy="4" r="7" />
+      <polygon points="36,-3 39,-11 43,-1" />
+      <path d="M 1 14 C -12 16 -17 9 -24 5" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
+      <path d="M 11 17 L -3 29" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
+      <path d="M 31 14 L 47 24" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
+    </g>
+  </g>
+
+  <!-- 短褲本體 -->
+  <path
+    d="
+      M 235 448
+      C 271 440 341 441 375 449
+      L 388 544
+      C 366 553 338 552 311 544
+      C 285 554 253 553 228 543
+      Z
+    "
+    fill="url(#shortsGradient)"
+    stroke="#438bc5"
+    stroke-width="4"
+    filter="url(#smallShadow)"
+  />
+
+  <!-- 腰頭 -->
+  <path d="M 237 448 C 270 459 344 458 374 448" fill="none" stroke="#68afe3" stroke-width="14" />
+
+  <!-- 腰部鬆緊皺褶 -->
+  <g stroke="#3f91ca" stroke-width="2" opacity="0.65">
+    <path d="M 252 446 L 251 462" />
+    <path d="M 266 448 L 265 463" />
+    <path d="M 280 449 L 279 464" />
+    <path d="M 294 449 L 294 464" />
+    <path d="M 322 449 L 322 464" />
+    <path d="M 337 448 L 337 463" />
+    <path d="M 352 447 L 352 462" />
+  </g>
+
+  <!-- 腰帶蝴蝶結 -->
+  <path d="M 304 462 C 282 448 270 458 280 474 C 291 484 301 475 304 466 Z" fill="#9ed8fb" stroke="#3d87be" stroke-width="3" />
+  <path d="M 307 462 C 329 447 343 458 332 475 C 321 484 311 475 307 466 Z" fill="#9ed8fb" stroke="#3d87be" stroke-width="3" />
+  <circle cx="305" cy="464" r="7" fill="#76bbe8" stroke="#3d87be" stroke-width="3" />
+  <path d="M 301 470 L 292 508" fill="none" stroke="#5aa5d8" stroke-width="6" stroke-linecap="round" />
+  <path d="M 310 470 L 320 509" fill="none" stroke="#5aa5d8" stroke-width="6" stroke-linecap="round" />
+
+  <!-- 短褲中央分線 -->
+  <path d="M 308 466 C 306 493 308 520 311 544" fill="none" stroke="#418fc8" stroke-width="3" />
+
+  <!-- 短褲抓皺 -->
+  <g fill="none" stroke="#d6f2ff" stroke-width="2" opacity="0.55">
+    <path d="M 250 470 C 259 491 257 514 252 535" />
+    <path d="M 276 469 C 283 492 281 518 277 540" />
+    <path d="M 338 469 C 329 493 332 519 337 541" />
+    <path d="M 363 469 C 354 493 358 516 364 536" />
+  </g>
+
+  <!-- 蕾絲花邊底帶 -->
+  <path
+    d="
+      M 229 520
+      C 252 531 282 532 310 522
+      C 336 532 365 533 387 522
+      L 389 547
+      C 366 558 336 557 311 547
+      C 285 558 252 557 227 545
+      Z
+    "
+    fill="url(#lacePattern)"
+    opacity="0.96"
+  />
+
+  <!-- 波浪刺繡下擺 -->
+  <path
+    d="
+      M 228 543
+      C 237 554 247 554 256 543
+      C 266 555 278 555 288 544
+      C 297 556 305 556 312 546
+      C 321 556 332 556 341 545
+      C 351 556 363 555 371 544
+      C 378 552 384 552 389 547
+    "
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+
+  <!-- 左腿 -->
+  <path
+    d="
+      M 255 548
+      C 251 587 252 626 255 662
+      C 257 680 274 691 292 687
+      C 307 684 311 671 307 652
+      L 302 550
+      Z
+    "
+    fill="url(#skinGradient)"
+    stroke="#d69787"
+    stroke-width="4"
+  />
+
+  <!-- 右腿 -->
+  <path
+    d="
+      M 316 550
+      L 324 655
+      C 325 678 338 687 356 681
+      C 373 676 377 660 371 641
+      C 363 610 358 580 359 548
+      Z
+    "
+    fill="url(#skinGradient)"
+    stroke="#d69787"
+    stroke-width="4"
+  />
+
+  <!-- 左襪 (純白中筒襪) -->
+  <path
+    d="
+      M 255 637
+      C 268 646 290 645 306 638
+      L 310 703
+      C 292 713 267 712 252 700
+      Z
+    "
+    fill="#fbfdff"
+    stroke="#cbd4df"
+    stroke-width="3"
+  />
+
+  <!-- 右襪 (純白中筒襪) -->
+  <path
+    d="
+      M 326 636
+      C 338 645 359 643 371 634
+      L 379 697
+      C 363 708 339 710 323 699
+      Z
+    "
+    fill="#fbfdff"
+    stroke="#cbd4df"
+    stroke-width="3"
+  />
+
+  <!-- 襪子羅紋細節 -->
+  <g stroke="#d9e0e8" stroke-width="2">
+    <path d="M 263 647 L 260 694" />
+    <path d="M 274 649 L 272 701" />
+    <path d="M 286 648 L 286 702" />
+    <path d="M 297 646 L 301 697" />
+    <path d="M 336 647 L 334 700" />
+    <path d="M 348 647 L 349 704" />
+    <path d="M 359 644 L 364 700" />
+  </g>
+
+  <!-- 襪口荷葉蕾絲邊飾 (Ankle Lace Scallop) -->
+  <g fill="#ffffff" stroke="#cbd4df" stroke-width="1.5">
+    <!-- 左腳蕾絲波浪 -->
+    <path d="M 248 693 C 253 686 261 688 266 695 C 272 687 280 688 285 696 C 291 688 299 689 304 697 C 310 689 317 692 319 700 L 314 705 C 300 701 262 699 248 693 Z" fill="#ffffff" />
+    <!-- 右腳蕾絲波浪 -->
+    <path d="M 321 694 C 326 686 334 688 339 695 C 345 687 353 688 358 696 C 364 688 372 689 377 697 C 383 689 390 692 392 700 L 387 705 C 373 701 335 699 321 694 Z" fill="#ffffff" />
+  </g>
+
+  <!-- ==================== 粉紅娃娃鞋 (Pink Mary Jane Doll Shoes - 精緻比例・自然分開不重疊) ==================== -->
+  <!-- 左娃娃鞋 -->
+  <g filter="url(#softShadow)">
+    <!-- 鞋身主體 (圓頭瑪莉珍娃娃鞋) -->
+    <path
+      d="
+        M 256 704
+        C 268 696 290 696 302 706
+        C 310 716 310 730 300 740
+        C 288 747 262 747 250 739
+        C 242 729 245 715 256 704
+        Z
+      "
+      fill="url(#shoePinkGrad)"
+      stroke="#be185d"
+      stroke-width="3"
+    />
+    <!-- 娃娃鞋內側低開口鞋口 -->
+    <path
+      d="
+        M 260 703
+        C 272 698 288 699 298 707
+        C 292 716 274 717 265 713
+        C 258 709 257 705 260 703
+        Z
+      "
+      fill="url(#shoeInnerGrad)"
+      stroke="#9d174d"
+      stroke-width="1.8"
+    />
+    <!-- 娃娃鞋漆皮弧形高光 (Patent Leather Sheen) -->
+    <path
+      d="
+        M 252 728
+        C 260 738 286 740 300 733
+        C 288 737 263 735 256 726
+        Z
+      "
+      fill="#ffffff"
+      opacity="0.65"
+    />
+    <path
+      d="M 270 736 C 280 738 293 734 298 729"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+      opacity="0.8"
+    />
+    <!-- 瑪莉珍橫向一字帶 (Instep Strap) -->
+    <path
+      d="M 258 709 C 272 706 288 712 296 716"
+      fill="none"
+      stroke="#db2777"
+      stroke-width="4.5"
+      stroke-linecap="round"
+    />
+    <path
+      d="M 258 709 C 272 706 288 712 296 716"
+      fill="none"
+      stroke="#fbcfe8"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+    <!-- 金屬珍珠釦飾 (外側) -->
+    <circle cx="258" cy="709" r="4" fill="url(#buckleGold)" stroke="#b45309" stroke-width="1.2" />
+    <circle cx="257" cy="707" r="1.2" fill="#ffffff" />
+    <!-- 鞋頭精緻小蝴蝶結 -->
+    <g transform="translate(288, 727) rotate(-10)">
+      <path d="M 0 0 C -6 -5 -8 2 -1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <path d="M 0 0 C 6 -5 8 2 1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <circle cx="0" cy="0.8" r="2.2" fill="url(#buckleGold)" stroke="#b45309" stroke-width="0.8" />
+    </g>
+    <!-- 娃娃鞋深色薄底 -->
+    <path
+      d="M 248 737 C 263 746 289 746 302 738"
+      fill="none"
+      stroke="#831843"
+      stroke-width="3.5"
+      stroke-linecap="round"
+    />
+  </g>
+
+  <!-- 右娃娃鞋 -->
+  <g filter="url(#softShadow)">
+    <!-- 鞋身主體 (圓頭瑪莉珍娃娃鞋) -->
+    <path
+      d="
+        M 326 706
+        C 338 696 360 696 372 704
+        C 383 715 386 729 378 739
+        C 366 747 340 747 328 740
+        C 318 730 318 716 326 706
+        Z
+      "
+      fill="url(#shoePinkGrad)"
+      stroke="#be185d"
+      stroke-width="3"
+    />
+    <!-- 娃娃鞋內側低開口鞋口 -->
+    <path
+      d="
+        M 330 707
+        C 340 699 356 698 368 703
+        C 371 705 370 709 363 713
+        C 354 717 336 716 330 707
+        Z
+      "
+      fill="url(#shoeInnerGrad)"
+      stroke="#9d174d"
+      stroke-width="1.8"
+    />
+    <!-- 娃娃鞋漆皮弧形高光 (Patent Leather Sheen) -->
+    <path
+      d="
+        M 328 733
+        C 342 740 368 738 376 728
+        C 372 735 347 737 335 726
+        Z
+      "
+      fill="#ffffff"
+      opacity="0.65"
+    />
+    <path
+      d="M 330 729 C 335 734 348 738 358 736"
+      fill="none"
+      stroke="#ffffff"
+      stroke-width="2"
+      stroke-linecap="round"
+      opacity="0.8"
+    />
+    <!-- 瑪莉珍橫向一字帶 (Instep Strap) -->
+    <path
+      d="M 332 716 C 340 712 356 706 370 709"
+      fill="none"
+      stroke="#db2777"
+      stroke-width="4.5"
+      stroke-linecap="round"
+    />
+    <path
+      d="M 332 716 C 340 712 356 706 370 709"
+      fill="none"
+      stroke="#fbcfe8"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+    <!-- 金屬珍珠釦飾 (外側) -->
+    <circle cx="370" cy="709" r="4" fill="url(#buckleGold)" stroke="#b45309" stroke-width="1.2" />
+    <circle cx="369" cy="707" r="1.2" fill="#ffffff" />
+    <!-- 鞋頭精緻小蝴蝶結 -->
+    <g transform="translate(340, 727) rotate(10)">
+      <path d="M 0 0 C -6 -5 -8 2 -1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <path d="M 0 0 C 6 -5 8 2 1 2.5 Z" fill="#f472b6" stroke="#be185d" stroke-width="1.2" />
+      <circle cx="0" cy="0.8" r="2.2" fill="url(#buckleGold)" stroke="#b45309" stroke-width="0.8" />
+    </g>
+    <!-- 娃娃鞋深色薄底 -->
+    <path
+      d="M 326 738 C 339 746 365 746 380 737"
+      fill="none"
+      stroke="#831843"
+      stroke-width="3.5"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>

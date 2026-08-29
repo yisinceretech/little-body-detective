@@ -1,0 +1,188 @@
+<svg viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 1. 主動脈與動脈幹 (充氧動脈血：亮鮮紅) -->
+    <linearGradient id="arterialAorta" x1="260" y1="80" x2="480" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ff667a"/>
+      <stop offset="35%" stop-color="#e32243"/>
+      <stop offset="80%" stop-color="#a6112d"/>
+      <stop offset="100%" stop-color="#610719"/>
+    </linearGradient>
+
+    <!-- 2. 靜脈與肺動脈 (真實缺氧血：深紫紅/暗酒紅，非藍色) -->
+    <linearGradient id="venousRed" x1="210" y1="100" x2="420" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#b83750"/>
+      <stop offset="35%" stop-color="#8a1c32"/>
+      <stop offset="80%" stop-color="#540b1b"/>
+      <stop offset="100%" stop-color="#33040e"/>
+    </linearGradient>
+
+    <!-- 3. 右心室前壁肌肉 (心肌粉紅至深紅) -->
+    <linearGradient id="rvGrad" x1="240" y1="280" x2="440" y2="560" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f24660"/>
+      <stop offset="45%" stop-color="#c91a3a"/>
+      <stop offset="85%" stop-color="#800b23"/>
+      <stop offset="100%" stop-color="#4a0312"/>
+    </linearGradient>
+
+    <!-- 4. 左心室壁與心尖 (深邃心肌紅) -->
+    <linearGradient id="lvGrad" x1="380" y1="330" x2="540" y2="610" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d92343"/>
+      <stop offset="50%" stop-color="#990f28"/>
+      <stop offset="100%" stop-color="#45020f"/>
+    </linearGradient>
+
+    <!-- 5. 右心房 (Right Atrium) -->
+    <linearGradient id="raGrad" x1="170" y1="240" x2="290" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fa5772"/>
+      <stop offset="55%" stop-color="#cc1f3f"/>
+      <stop offset="100%" stop-color="#780a22"/>
+    </linearGradient>
+
+    <!-- 6. 冠狀動脈 (鮮亮朱紅) -->
+    <linearGradient id="coronaryArt" x1="320" y1="320" x2="470" y2="580" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffe2b8"/>
+      <stop offset="30%" stop-color="#ff3b56"/>
+      <stop offset="100%" stop-color="#8a0c22"/>
+    </linearGradient>
+
+    <!-- 7. 冠狀靜脈 (真實暗紫酒紅) -->
+    <linearGradient id="coronaryVeinReal" x1="320" y1="320" x2="470" y2="580" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c2445e"/>
+      <stop offset="50%" stop-color="#690f22"/>
+      <stop offset="100%" stop-color="#36020c"/>
+    </linearGradient>
+
+    <!-- 左上方 45 度自然高光 -->
+    <linearGradient id="naturalHighlight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ================= 1. 背景實心底層（防止透光） ================= -->
+  <path d="M220 200 C220 150 460 130 480 250 C540 380 540 560 460 620 C360 620 220 540 200 400 Z" 
+        fill="#5c0617"/>
+
+  <!-- ================= 2. 後層大血管（上腔靜脈、肺動脈分支、肺靜脈） ================= -->
+  <g id="posterior-vessels">
+    <!-- 上腔靜脈 Superior Vena Cava (暗酒紅靜脈血色) -->
+    <path d="M245 125 C242 180 246 225 256 265 L302 258 C294 215 290 170 294 120 C278 115 260 118 245 125 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- 右肺動脈分支 Right Pulmonary Artery -->
+    <path d="M295 245 C265 240 230 248 210 260 L218 285 C240 272 270 268 298 270 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="4.5"/>
+
+    <!-- 左肺靜脈 Left Pulmonary Veins (充氧血：鮮紅) -->
+    <path d="M465 255 C490 250 518 260 532 276 L518 296 C500 284 480 282 460 285 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4"/>
+    <path d="M455 298 C480 295 508 305 522 322 L505 340 C490 328 472 322 450 326 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4"/>
+
+    <!-- 右肺靜脈 Right Pulmonary Veins (充氧血：鮮紅) -->
+    <path d="M205 285 C182 280 155 290 142 308 L158 322 C172 310 192 308 215 310 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4"/>
+  </g>
+
+  <!-- ================= 3. 主動脈弓及三大分支 (Aortic Arch) ================= -->
+  <g id="aortic-arch">
+    <!-- 升主動脈根部 -->
+    <path d="M285 240 C280 205 320 175 375 195 L375 320 C320 330 285 300 285 240 Z" 
+          fill="url(#arterialAorta)"/>
+
+    <!-- 1. 頭臂幹 (Brachiocephalic) -->
+    <path d="M305 165 L288 78 C288 68 308 64 316 76 L335 152 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4.5" stroke-linejoin="round"/>
+    <!-- 2. 左頸總動脈 (Left Common Carotid) -->
+    <path d="M352 142 L362 65 C364 57 384 57 386 65 L382 132 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4.5" stroke-linejoin="round"/>
+    <!-- 3. 左鎖骨下動脈 (Left Subclavian) -->
+    <path d="M400 135 L430 70 C432 62 452 66 448 76 L425 142 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="4.5" stroke-linejoin="round"/>
+
+    <!-- 主動脈弓本體 -->
+    <path d="M290 235 C280 150 365 95 450 130 C492 152 502 210 465 280 L418 258 C442 210 435 174 408 160 C355 132 320 170 325 235 Z" 
+          fill="url(#arterialAorta)" stroke="#450512" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- ================= 4. 肺動脈幹 (Pulmonary Trunk - 深暗紫紅血管) ================= -->
+  <g id="pulmonary-artery">
+    <!-- 左肺動脈分支 -->
+    <path d="M375 195 C420 185 472 192 510 212 L496 238 C460 225 420 220 382 228 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="4.5"/>
+    
+    <!-- 肺動脈幹主體 -->
+    <path d="M305 345 C298 255 345 195 415 205 C410 230 400 255 380 275 C345 255 330 280 320 348 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="5"/>
+    <path d="M295 355 C302 275 350 220 408 235 C390 285 355 335 310 365 Z" 
+          fill="url(#venousRed)" stroke="#3b050f" stroke-width="5"/>
+  </g>
+
+  <!-- ================= 5. 心房結構 (Atria & Auricles) ================= -->
+  <g id="atria">
+    <!-- 右心房 Right Atrium -->
+    <path d="M256 260 C205 270 185 310 195 365 C205 410 238 430 268 425 C252 375 248 310 268 258 Z" 
+          fill="url(#raGrad)" stroke="#450512" stroke-width="5"/>
+
+    <!-- 左心耳 Left Auricle -->
+    <path d="M435 255 C470 265 490 295 480 330 C472 350 455 362 440 362 C448 325 440 285 435 255 Z" 
+          fill="url(#lvGrad)" stroke="#450512" stroke-width="5"/>
+  </g>
+
+  <!-- ================= 6. 心室主體與動脈圓錐 (Ventricles) ================= -->
+  <g id="ventricles">
+    <!-- 動脈圓錐 (Conus Arteriosus) -->
+    <path d="M260 375 C270 325 320 325 335 365 L380 355 C380 355 340 425 260 375 Z" 
+          fill="url(#rvGrad)"/>
+
+    <!-- 心室外廓整體（無任何底部錯誤管道） -->
+    <path d="M268 415 C238 440 242 480 275 515 C320 565 395 605 465 620 C505 628 532 598 538 550 C548 460 548 375 480 340 C430 355 330 335 268 415 Z" 
+          fill="url(#rvGrad)" stroke="#450512" stroke-width="5.5" stroke-linejoin="round"/>
+
+    <!-- 左心室壁外側層次 -->
+    <path d="M375 345 C435 358 480 338 480 338 C548 372 548 458 538 548 C532 595 505 625 465 620 C438 615 408 570 382 530 C338 450 352 378 375 345 Z" 
+          fill="url(#lvGrad)" stroke="#450512" stroke-width="4.5"/>
+  </g>
+
+  <!-- ================= 7. 前室間溝與全紅冠狀血管系統 ================= -->
+  <g id="coronary-circulation">
+    <!-- 前室間溝自然陰影 -->
+    <path d="M326 352 Q362 440 456 612" stroke="#2b0209" stroke-width="12" stroke-linecap="round" opacity="0.35"/>
+
+    <!-- 冠狀溝與血管周圍心外膜脂肪 (Epicardial Fat Pads - 逼真淡黃) -->
+    <ellipse cx="328" cy="365" rx="14" ry="7.5" fill="#fadc8c" opacity="0.65" transform="rotate(-25 328 365)"/>
+    <ellipse cx="372" cy="445" rx="11" ry="6" fill="#fadc8c" opacity="0.5" transform="rotate(30 372 445)"/>
+    <ellipse cx="422" cy="540" rx="9" ry="5" fill="#fadc8c" opacity="0.45" transform="rotate(40 422 540)"/>
+
+    <!-- 心大靜脈 Great Cardiac Vein (真實深暗暗紅) -->
+    <path d="M332 355 Q368 435 454 602" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M362 415 Q398 428 435 438" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M392 495 Q428 510 458 520" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M345 375 Q310 395 285 410" fill="none" stroke="url(#coronaryVeinReal)" stroke-width="2.8" stroke-linecap="round"/>
+
+    <!-- 左前降支冠狀動脈 LAD Artery (鮮亮動脈紅) -->
+    <path d="M324 352 Q356 438 446 608" fill="none" stroke="url(#coronaryArt)" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M344 390 Q305 415 275 440" fill="none" stroke="url(#coronaryArt)" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M295 430 Q275 452 268 475" fill="none" stroke="url(#coronaryArt)" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M370 445 Q410 468 446 478" fill="none" stroke="url(#coronaryArt)" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M394 520 Q430 540 458 550" fill="none" stroke="url(#coronaryArt)" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+
+  <!-- ================= 8. 自然高光與光澤 ================= -->
+  <g id="lighting" pointer-events="none">
+    <!-- 主動脈弓高光 -->
+    <path d="M310 170 C320 132 375 118 420 138" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.85"/>
+    <path d="M315 174 C325 140 365 128 405 144" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+
+    <!-- 肺動脈圓錐弧光 -->
+    <path d="M325 285 C340 252 378 238 402 246" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.65"/>
+
+    <!-- 左上方 45 度心肌柔光 -->
+    <path d="M215 310 C205 345 212 385 235 415" fill="none" stroke="url(#naturalHighlight)" stroke-width="5" stroke-linecap="round"/>
+    <path d="M255 425 C242 455 252 485 275 510" fill="none" stroke="url(#naturalHighlight)" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- 心尖 Apex 頂點微光 -->
+    <circle cx="465" cy="615" r="3" fill="#ffffff" opacity="0.9"/>
+  </g>
+</svg>
